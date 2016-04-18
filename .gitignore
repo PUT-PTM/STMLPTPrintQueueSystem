@@ -30,3 +30,30 @@
 
 # Debug files
 *.dSYM/
+
+# WebSys Panel files
+/websys/app/config/parameters.yml
+/websys/build/
+/websys/phpunit.xml
+/websys/var/*
+!/websys/var/cache
+/websys/var/cache/*
+!websys/var/cache/.gitkeep
+!/websys/var/logs
+/websys/var/logs/*
+!websys/var/logs/.gitkeep
+!/websys/var/sessions
+/websys/var/sessions/*
+!websys/var/sessions/.gitkeep
+!websys/var/SymfonyRequirements.php
+/websys/vendor/
+/websys/web/bundles/
+
+# Vagrant
+.vagrant/
+
+# InteliJ
+.idea/
+
+# Temporary files
+*~
