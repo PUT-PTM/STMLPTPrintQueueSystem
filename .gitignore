@@ -57,3 +57,8 @@
 
 # Temporary files
 *~
+
+# CooCox Builds
+/hwlayer/hwlayer/*
+*.cogui
+*.comarker
