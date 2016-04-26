@@ -48,6 +48,7 @@
 !websys/var/SymfonyRequirements.php
 /websys/vendor/
 /websys/web/bundles/
+/websys/nbproject
 
 # Vagrant
 .vagrant/

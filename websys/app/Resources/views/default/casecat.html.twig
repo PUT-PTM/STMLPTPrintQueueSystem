@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div id="wrapper">
+    <h1>LPT Print Queue System &mdash; case categories list</h1>
+    <ul>
+        {% for item in categories %}
+            <li>{{ item.name }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
