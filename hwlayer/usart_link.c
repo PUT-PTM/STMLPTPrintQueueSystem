@@ -5,6 +5,7 @@
 #include "misc.h"
 #include "stm32f4xx_exti.h"
 #include "usart_link.h"
+#include "led_indicators.h"
 
 void usart_configure()
 {
@@ -62,10 +63,11 @@ void UART4_IRQHandler(void)
 {
 	if (USART_GetITStatus(UART4, USART_IT_RXNE) != RESET)
 	{
+
 		if(UART4->DR == '1') {
-			GPIO_SetBits(GPIOD, GPIO_Pin_12);
+			set_green_led_on();
 		} else if(UART4->DR == '0') {
-			GPIO_ResetBits(GPIOD, GPIO_Pin_12);
+			set_green_led_off();
 		}
 	}
 }
