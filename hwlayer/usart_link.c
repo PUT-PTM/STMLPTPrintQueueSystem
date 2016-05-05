@@ -7,6 +7,8 @@
 #include "usart_link.h"
 #include "led_indicators.h"
 
+extern volatile RcvBuff uart_buffer;
+
 void usart_configure()
 {
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
@@ -46,6 +48,8 @@ void usart_configure()
 
 	NVIC_Init(&usart_nvic);
 	NVIC_EnableIRQ(UART4_IRQn);
+
+	RcvBuffInit(&uart_buffer);
 }
 
 void send_char(char c)
@@ -57,17 +61,32 @@ void send_char(char c)
 void send_string(const char* s)
 {
 	while(*s) send_char(*s++);
+	send_char('\n');
+}
+
+void RcvBuffInit(volatile RcvBuff* buffer)
+{
+	buffer->current_pos = 0;
+	buffer->ready = 0;
+}
+
+void RcvBuffReset(volatile RcvBuff* buffer)
+{
+	buffer->ready = 0;
+	buffer->current_pos = 0;
 }
 
 void UART4_IRQHandler(void)
 {
 	if (USART_GetITStatus(UART4, USART_IT_RXNE) != RESET)
 	{
-
-		if(UART4->DR == '1') {
-			set_green_led_on();
-		} else if(UART4->DR == '0') {
-			set_green_led_off();
+		if(uart_buffer.ready == 0) {
+			if(UART4->DR == '\n') {
+				uart_buffer.ready = 1;
+				uart_buffer.buffer[uart_buffer.current_pos] = '\0';
+			} else {
+				uart_buffer.buffer[uart_buffer.current_pos++] = UART4->DR;
+			}
 		}
 	}
 }
