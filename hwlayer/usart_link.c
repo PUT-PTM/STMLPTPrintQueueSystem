@@ -49,7 +49,7 @@ void usart_configure()
 	NVIC_Init(&usart_nvic);
 	NVIC_EnableIRQ(UART4_IRQn);
 
-	RcvBuffInit(&uart_buffer);
+	RcvBuffReset(&uart_buffer);
 }
 
 void send_char(char c)
@@ -62,12 +62,6 @@ void send_string(const char* s)
 {
 	while(*s) send_char(*s++);
 	send_char('\n');
-}
-
-void RcvBuffInit(volatile RcvBuff* buffer)
-{
-	buffer->current_pos = 0;
-	buffer->ready = 0;
 }
 
 void RcvBuffReset(volatile RcvBuff* buffer)

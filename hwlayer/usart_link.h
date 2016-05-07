@@ -8,7 +8,6 @@ typedef struct {
 
 volatile RcvBuff uart_buffer;
 
-void RcvBuffInit(volatile RcvBuff* buffer);
 void RcvBuffReset(volatile RcvBuff* buffer);
 
 // Configuration
