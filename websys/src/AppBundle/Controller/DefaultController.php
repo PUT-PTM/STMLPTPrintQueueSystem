@@ -13,6 +13,28 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        return $this->render('default/index.html.twig');
+        $curNum = $this->getCurrentPetitioner();
+
+        return $this->render('default/index.html.twig', array('curNum' => $curNum));
+    }
+
+    private function getCurrentPetitioner()
+    {
+        $uid = $this->getUser()->getId();
+        $em = $this->getDoctrine()->getManager();
+        $query = $em->createQuery(
+            'SELECT p.generatedNum
+             FROM AppBundle:PetitionerNumber p
+             JOIN p.status s
+             JOIN p.assignedUser u
+             WHERE s.name = \'In Progress\'
+             AND u.id = :user'
+        )->setParameter('user', $uid);
+
+        try {
+            return $query->getSingleResult();
+        } catch (\Doctrine\ORM\NoResultException $e) {
+            return null;
+        }
     }
 }

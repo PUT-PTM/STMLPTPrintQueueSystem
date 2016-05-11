@@ -31,10 +31,10 @@ class Status
 
     /**
      * @var ArrayCollection
-     * 
+     *
      * @ORM\OneToMany(targetEntity="PetitionerNumber", mappedBy="status")
      */
-
+    private $petitionerNumbers;
 
     /**
      * Get id
@@ -68,5 +68,46 @@ class Status
     public function getName()
     {
         return $this->name;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->petitionerNumbers = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add petitionerNumber
+     *
+     * @param \AppBundle\Entity\PetitionerNumber $petitionerNumber
+     *
+     * @return Status
+     */
+    public function addPetitionerNumber(\AppBundle\Entity\PetitionerNumber $petitionerNumber)
+    {
+        $this->petitionerNumbers[] = $petitionerNumber;
+
+        return $this;
+    }
+
+    /**
+     * Remove petitionerNumber
+     *
+     * @param \AppBundle\Entity\PetitionerNumber $petitionerNumber
+     */
+    public function removePetitionerNumber(\AppBundle\Entity\PetitionerNumber $petitionerNumber)
+    {
+        $this->petitionerNumbers->removeElement($petitionerNumber);
+    }
+
+    /**
+     * Get petitionerNumbers
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPetitionerNumbers()
+    {
+        return $this->petitionerNumbers;
     }
 }

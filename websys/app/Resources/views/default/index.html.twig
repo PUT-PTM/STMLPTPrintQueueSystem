@@ -4,7 +4,7 @@
 <div id="wrapper">
     <h1>LPT Print Queue System &mdash; Welcome</h1>
     <p>Hello, {{ app.user.username }}! <a href="{{ path('fos_user_security_logout') }}">Log out</a></p>
-    <p>Current number: </p>
+    <p>Current number: {{ curNum.generatedNum | default('none') }}</p>
     <p>Select an option:</p>
     <ul>
         <li><a href="{{ path('app_casecategories_list') }}">Categories list</a></li>
