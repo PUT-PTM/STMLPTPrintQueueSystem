@@ -10,4 +10,16 @@ namespace AppBundle\Repository;
  */
 class PetitionerNumberRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function getOldestNewCase()
+    {
+        return $this->getEntityManager()
+                ->createQuery('SELECT p
+                               FROM AppBundle:PetitionerNumber p
+                               JOIN p.status s
+                               WHERE s.name = \'New\'
+                               ORDER BY p.createdOn'
+                )
+                ->setMaxResults(1)
+                ->getSingleResult();
+    }
 }

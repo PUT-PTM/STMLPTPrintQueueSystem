@@ -15,7 +15,8 @@
         </div>
     {% endfor %}
     <p>Current number: {{ curNum.generatedNum | default('none') }}</p>
-    <a href={{ path('end_visit') }}>End visit</a>
+    <a href="{{ path('end_case') }}">End case</a><br />
+    <a href="{{ path('start_case') }}">Start next case</a><br />
     <p>Select an option:</p>
     <ul>
         <li><a href="{{ path('app_casecategories_list') }}">Categories list</a></li>

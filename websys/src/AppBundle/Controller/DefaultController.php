@@ -19,7 +19,38 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/end", name="end_visit")
+     * @Route("/start", name="start_case")
+     */
+    public function startCaseAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $curNum = $this->getCurrentPetitioner();
+        if($curNum != null) {
+            $this->addFlash('error', 'Unable to start new case! Please close current case first.');
+        } else {
+            try {
+                $numberToProcess = $em->getRepository('AppBundle:PetitionerNumber')->getOldestNewCase();
+
+                // Fetch "In Progress Status" object from database.
+                $status = $em->getRepository('AppBundle:Status')
+                        ->getInProgressStatus();
+
+                $numberToProcess->setStatus($status)
+                                ->setAssignedUser($this->getUser())
+                                ->setUpdatedOn(new \DateTime('now'));
+
+                $em->flush();
+
+                $this->addFlash('notice', 'Next case started successfully!');
+            } catch (\Doctrine\ORM\NoResultException $e) {
+                $this->addFlash('error', 'No one is in the queue. Please try again later.');
+            }
+        }
+        return $this->redirectToRoute('homepage');
+    }
+
+    /**
+     * @Route("/end", name="end_case")
      */
     public function endCaseAction()
     {
