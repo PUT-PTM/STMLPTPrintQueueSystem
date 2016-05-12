@@ -10,4 +10,31 @@ namespace AppBundle\Repository;
  */
 class StatusRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function getNewStatus()
+    {
+        return $this->getEntityManager()
+                ->createQuery('SELECT s FROM AppBundle:Status s WHERE s.name = \'New\'')
+                ->getSingleResult();
+    }
+
+    public function getInProgressStatus()
+    {
+        return $this->getEntityManager()
+                ->createQuery('SELECT s FROM AppBundle:Status s WHERE s.name = \'In Progress\'')
+                ->getSingleResult();
+    }
+
+    public function getAssignedStatus()
+    {
+        return $this->getEntityManager()
+                ->createQuery('SELECT s FROM AppBundle:Status s WHERE s.name = \'Assigned\'')
+                ->getSingleResult();
+    }
+
+    public function getEndStatus()
+    {
+        return $this->getEntityManager()
+                ->createQuery('SELECT s FROM AppBundle:Status s WHERE s.name = \'End\'')
+                ->getSingleResult();
+    }
 }

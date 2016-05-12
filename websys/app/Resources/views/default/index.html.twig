@@ -4,7 +4,18 @@
 <div id="wrapper">
     <h1>LPT Print Queue System &mdash; Welcome</h1>
     <p>Hello, {{ app.user.username }}! <a href="{{ path('fos_user_security_logout') }}">Log out</a></p>
+    {% for flash_message in app.session.flashBag.get('notice') %}
+        <div class="flash-notice">
+            {{ flash_message }}
+        </div>
+    {% endfor %}
+    {% for flash_message in app.session.flashBag.get('error') %}
+        <div class="flash-error">
+            {{ flash_message }}
+        </div>
+    {% endfor %}
     <p>Current number: {{ curNum.generatedNum | default('none') }}</p>
+    <a href={{ path('end_visit') }}>End visit</a>
     <p>Select an option:</p>
     <ul>
         <li><a href="{{ path('app_casecategories_list') }}">Categories list</a></li>
