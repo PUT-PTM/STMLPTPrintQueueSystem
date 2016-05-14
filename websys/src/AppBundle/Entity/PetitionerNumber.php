@@ -59,9 +59,8 @@ class PetitionerNumber
     private $assignedUser;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="position", type="string", length=10, nullable=true)
+     * @ORM\ManyToOne(targetEntity="Position", inversedBy="petitionerNumbers")
+     * @ORM\JoinColumn(name="position_id", referencedColumnName="id")
      */
     private $position;
 
@@ -159,11 +158,11 @@ class PetitionerNumber
     /**
      * Set position
      *
-     * @param string $position
+     * @param \AppBundle\Entity\Position $position
      *
      * @return PetitionerNumber
      */
-    public function setPosition($position)
+    public function setPosition(\AppBundle\Entity\Position $position = null)
     {
         $this->position = $position;
 
@@ -173,7 +172,7 @@ class PetitionerNumber
     /**
      * Get position
      *
-     * @return string
+     * @return \AppBundle\Entity\Position
      */
     public function getPosition()
     {

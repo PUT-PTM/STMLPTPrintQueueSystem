@@ -26,6 +26,11 @@ class User extends BaseUser
     private $petitionerNumbers;
 
     /**
+     * @ORM\OneToOne(targetEntity="Position", mappedBy="assignedUser")
+     */
+    private $position;
+
+    /**
      * User constructor.
      */
     public function __construct()
@@ -66,5 +71,29 @@ class User extends BaseUser
     public function getPetitionerNumbers()
     {
         return $this->petitionerNumbers;
+    }
+
+    /**
+     * Set position
+     *
+     * @param \AppBundle\Entity\Position $position
+     *
+     * @return User
+     */
+    public function setPosition(\AppBundle\Entity\Position $position = null)
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    /**
+     * Get position
+     *
+     * @return \AppBundle\Entity\Position
+     */
+    public function getPosition()
+    {
+        return $this->position;
     }
 }
