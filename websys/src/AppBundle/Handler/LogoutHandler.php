@@ -22,8 +22,23 @@ class LogoutHandler implements LogoutHandlerInterface {
         $user = $token->getUser();
         if(null != $pos = $this->em->getRepository('AppBundle:Position')->findOneByAssignedUser($user)) {
             $pos->setAssignedUser(); // Freeing up the position
-            $this->em->flush();
         }
+        $endStatus = $this->em->getRepository('AppBundle:Status')
+                    ->getEndStatus();
+        $inProgressStatus = $this->em->getRepository('AppBundle:Status')
+                    ->getInProgressStatus();
+
+        $numberToClose = $this->em->getRepository('AppBundle:PetitionerNumber')
+                    ->findOneBy(array(
+                        'status' => $inProgressStatus,
+                        'assignedUser' => $user,
+                    ));
+        if($numberToClose) {
+            $numberToClose->setStatus($endStatus)
+                 ->setUpdatedOn(new \DateTime('now'));
+        }
+
+        $this->em->flush();
         $request->getSession()->invalidate();
     }
 }

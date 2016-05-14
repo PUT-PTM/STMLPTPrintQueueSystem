@@ -14,9 +14,12 @@
             {{ flash_message }}
         </div>
     {% endfor %}
-    <p>Current number: {{ curNum.generatedNum | default('none') }}</p>
-    <a href="{{ path('end_case') }}">End case</a><br />
-    <a href="{{ path('start_case') }}">Start next case</a><br />
+    {% if curNum %}
+        <p>Current number: {{ curNum.generatedNum }}</p>
+        <p><a href="{{ path('end_case') }}">End case</a></p>
+    {% else %}
+        <p><a href="{{ path('start_case') }}">Start next case</a></p>
+    {% endif %}
     <p>Select an option:</p>
     <ul>
         <li><a href="{{ path('app_casecategories_list') }}">Categories list</a></li>

@@ -4,13 +4,18 @@
 <div id="wrapper">
     <h1>LPT Print Queue System &mdash; Choose your position</h1>
     <p>Hello, {{ app.user.username }}! Please select your position:</p>
-    <form method="POST" action="">
-        <select name="position">
-            {% for pos in positions %}
-                <option value="{{ pos.id }}">{{ pos.name }}</option>
-            {% endfor %}
-        </select>
-        <input type="submit" value="Submit"/>
-    </form>
+    {% if positions %}
+        <form method="POST" action="">
+            <select name="position">
+                {% for pos in positions %}
+                    <option value="{{ pos.id }}">{{ pos.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Submit"/>
+        </form>
+    {% else %}
+        <p>All positions are occupied. Please try again later.<br />
+        <a href="{{ path('fos_user_security_logout') }}">Log out</a></p>
+    {% endif %}
 </div>
 {% endblock %}

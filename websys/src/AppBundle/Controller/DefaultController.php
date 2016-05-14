@@ -85,7 +85,7 @@ class DefaultController extends Controller
 
             // Fetch "End Status" object from database.
             $status = $em->getRepository('AppBundle:Status')
-                    ->getEndStatus($curNum['id']);
+                    ->getEndStatus();
 
             $numberToClose->setStatus($status)
                  ->setUpdatedOn(new \DateTime('now'));
