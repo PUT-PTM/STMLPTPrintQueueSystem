@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div id="wrapper">
+    <h1>LPT Print Queue System &mdash; Choose your position</h1>
+    <p>Hello, {{ app.user.username }}! Please select your position:</p>
+    <form method="POST" action="">
+        <select name="position">
+            {% for pos in positions %}
+                <option value="{{ pos.id }}">{{ pos.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Submit"/>
+    </form>
+</div>
+{% endblock %}

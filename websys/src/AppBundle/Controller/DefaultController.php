@@ -11,11 +11,30 @@ class DefaultController extends Controller
     /**
      * @Route("/", name="homepage")
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
+        if(!$this->getUser()->getPosition()) {
+            return $this->redirectToRoute('position_selector');
+        }
         $curNum = $this->getCurrentPetitioner();
-
         return $this->render('default/index.html.twig', array('curNum' => $curNum));
+    }
+
+    /**
+     * @Route("/position", name="position_selector")
+     */
+    public function positionAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $pos = $request->request->get('position');
+        if($pos != null) {
+            $position = $em->getRepository('AppBundle:Position')->find($pos);
+            $position->setAssignedUser($this->getUser());
+            $em->flush();
+            return $this->redirectToRoute('homepage');
+        }
+        $positions = $em->getRepository('AppBundle:Position')->findByAssignedUser(null);
+        return $this->render('default/positionSelector.html.twig', array('positions' => $positions));
     }
 
     /**
@@ -37,6 +56,7 @@ class DefaultController extends Controller
 
                 $numberToProcess->setStatus($status)
                                 ->setAssignedUser($this->getUser())
+                                ->setPosition($this->getUser()->getPosition())
                                 ->setUpdatedOn(new \DateTime('now'));
 
                 $em->flush();

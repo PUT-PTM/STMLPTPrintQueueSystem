@@ -17,16 +17,16 @@ class Position
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    
+
     /**
      * @var string
      * 
      * @ORM\Column(name="name", type="string", length=32, unique=true)
      */
     private $name;
-    
+
     /**
-     * @ORM\OneToOne(targetEntity="User", mappedBy="position")
+     * @ORM\OneToOne(targetEntity="User", inversedBy="position")
      * @ORM\JoinColumn(name="assigned_user_id", referencedColumnName="id")
      */
     private $assignedUser;
