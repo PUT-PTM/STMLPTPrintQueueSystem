@@ -111,7 +111,7 @@ void lpt_setup() {
 
 
   lpt_configure();
-  Delayms(1000);
+  //Delayms(1000);
 
   resetPrinter();
 
@@ -134,15 +134,15 @@ void lpt_loop() {
 
   resetPrinter();
 }
-int pin0 =0;
-int pin1 =0;
-int pin2 =0;
-int pin3 =0;
-int pin4 =0;
-int pin5 =0;
-int pin6 =0;
-int pin7 =0;
-int lpt_data =0;
+int pin0;
+int pin1;
+int pin2;
+int pin3;
+int pin4;
+int pin5;
+int pin6;
+int pin7;
+int lpt_data;
 
 void print_states(){
 	 pin0 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
@@ -156,9 +156,10 @@ void print_states(){
 	 lpt_data = GPIO_ReadOutputData(GPIOA);
 
 }
+uint8_t state;
 uint16_t check_state(uint16_t pin){
-	uint8_t state = GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_9);
-	if(state == 0){
+	 state = GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_9);
+	if(state == 1){
 	return 0;
 	}else return 1;
 }
