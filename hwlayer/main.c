@@ -2,7 +2,7 @@
 #include "usart_link.h"
 #include "usart_protocol.h"
 #include "led_indicators.h"
-
+#include "lpt_driver.h"
 extern volatile RcvBuff uart_buffer;
 
 int main(void)
@@ -11,6 +11,9 @@ int main(void)
 
 	usart_configure();
 	discovery_led_configure();
+
+	lpt_setup();
+	lpt_loop();
 
 	uint8_t ok = 0;
 	if(establish_connection()) {
