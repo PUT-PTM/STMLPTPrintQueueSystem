@@ -11,13 +11,13 @@ typedef uint8_t byte;
 
 byte startup_message[startup_num_lines][startup_charsPerLine];
 byte message[num_lines][charsPerLine];
-byte inbyte = 0;
+
 GPIO_InitTypeDef lpt_data_lines;
 GPIO_InitTypeDef lpt_states_lines;//ack and busy
 GPIO_InitTypeDef lpt_strobe_pin;
 
-void Delay(int time);
-void Delayms(int time);
+//void Delay(int time);
+//void Delayms(int time);
 void lpt_configure();
 void lpt_setup();
 uint16_t check_state(uint16_t pin);

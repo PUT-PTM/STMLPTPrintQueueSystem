@@ -1,18 +1,18 @@
 #include "lpt_driver.h"
 #include "stm32f4xx_rcc.h"
-
+#include "stm32f4xx_tim.h"
 
 
 #include <stdio.h>
-//#include "tm_stm32f4_delay.h"
+#include "tm_stm32f4_delay.h"
 
-void Delay(int time){
-	for(int i=0; i<time*1000;i++);
-}
-
-void Delayms(int time){
-	for(int i=0; i<time*100;i++);
-}
+//void Delay(int time){
+//	for(int i=0; i<time*1000;i++);
+//}
+//
+//void Delayms(int time){
+//	for(int i=0; i<time*100;i++);
+//}
 
 byte startup_message[startup_num_lines][startup_charsPerLine] = {
   "This is the startup message. It prints whenever",
@@ -48,7 +48,9 @@ byte message[num_lines][charsPerLine] = {
 
 
 void lpt_configure(){
-		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
 
 
@@ -62,7 +64,7 @@ void lpt_configure(){
 		lpt_data_lines.GPIO_Mode = GPIO_Mode_OUT;
 		lpt_data_lines.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 |GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
 		lpt_data_lines.GPIO_Speed = GPIO_Speed_50MHz;
-		GPIO_Init(GPIOB, &lpt_data_lines);
+		GPIO_Init(GPIOA, &lpt_data_lines);
 
 //ack and busy input
 		GPIO_InitTypeDef lpt_states_lines;
@@ -71,7 +73,7 @@ void lpt_configure(){
 				lpt_states_lines.GPIO_Mode = GPIO_Mode_IN;
 				lpt_states_lines.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
 				lpt_states_lines.GPIO_Speed = GPIO_Speed_50MHz;
-				GPIO_Init(GPIOB, &lpt_states_lines);
+				GPIO_Init(GPIOE, &lpt_states_lines);
 
 //strobe pin
 		GPIO_InitTypeDef lpt_strobe_pin;
@@ -80,7 +82,7 @@ void lpt_configure(){
 				lpt_strobe_pin.GPIO_Mode = GPIO_Mode_OUT;
 				lpt_strobe_pin.GPIO_Pin = GPIO_Pin_10;
 				lpt_strobe_pin.GPIO_Speed = GPIO_Speed_50MHz;
-				GPIO_Init(GPIOB, &lpt_strobe_pin);
+				GPIO_Init(GPIOD, &lpt_strobe_pin);
 
 }
 
@@ -132,9 +134,30 @@ void lpt_loop() {
 
   resetPrinter();
 }
+int pin0 =0;
+int pin1 =0;
+int pin2 =0;
+int pin3 =0;
+int pin4 =0;
+int pin5 =0;
+int pin6 =0;
+int pin7 =0;
+int lpt_data =0;
 
+void print_states(){
+	 pin0 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
+	 pin1 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
+	 pin2 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
+	 pin3 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
+	 pin4 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
+	 pin5 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
+	 pin6 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
+	 pin7 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
+	 lpt_data = GPIO_ReadOutputData(GPIOA);
+
+}
 uint16_t check_state(uint16_t pin){
-	uint8_t state = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_9);
+	uint8_t state = GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_9);
 	if(state == 0){
 	return 0;
 	}else return 1;
@@ -146,14 +169,14 @@ void printByte(byte inByte) {
 
 
 
-  GPIO_Write(GPIOB, inbyte);
+  GPIO_Write(GPIOE, inByte);
 
-  GPIO_SetBits(GPIOB,GPIO_Pin_10);
+  GPIO_SetBits(GPIOE,GPIO_Pin_10);
   //digitalWrite(nStrobe, LOW);       // strobe nStrobe to input data bits
 
   Delay(strobeWait);
  // digitalWrite(nStrobe, HIGH);
-  GPIO_ResetBits(GPIOB,GPIO_Pin_10);
+  GPIO_ResetBits(GPIOE,GPIO_Pin_10);
 
   while(check_state(GPIO_Pin_9) == 1) {
     // wait for busy line to go low
