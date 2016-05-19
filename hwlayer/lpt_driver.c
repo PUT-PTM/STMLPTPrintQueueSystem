@@ -4,15 +4,15 @@
 
 
 #include <stdio.h>
-#include "tm_stm32f4_delay/tm_stm32f4_delay.h"
+//#include "tm_stm32f4_delay/tm_stm32f4_delay.h"
 
-//void Delay(int time){
-//	for(int i=0; i<time*1000;i++);
-//}
-//
-//void Delayms(int time){
-//	for(int i=0; i<time*100;i++);
-//}
+void Delay(int time){
+	for(int i=0; i<time*100000;i++);
+}
+
+void Delayms(int time){
+	for(int i=0; i<time*10000;i++);
+}
 
 byte startup_message[startup_num_lines][startup_charsPerLine] = {
   "This is the startup message. It prints whenever",
