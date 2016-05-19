@@ -16,7 +16,7 @@
 
 byte startup_message[startup_num_lines][startup_charsPerLine] = {
   "This is the startup message. It prints whenever",
-  "the Arduino is reset.",
+  "the STM is reset.",
 };
 
 
@@ -120,7 +120,7 @@ void lpt_setup() {
   resetPrinter();
 
   //Serial.println("Delayms for 5 sec");
-  Delayms(5000);
+  Delayms(500);
 
   //Serial.println("Startup complete");
 }
@@ -143,18 +143,18 @@ int pin5;
 int pin6;
 int pin7;
 int lpt_data;
-
-void print_states(){
+byte InByteState;
+void print_states(byte InByte){
 	 pin0 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
-	 pin1 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
-	 pin2 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
-	 pin3 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
-	 pin4 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
-	 pin5 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
-	 pin6 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
-	 pin7 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
+	 pin1 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_1);
+	 pin2 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_2);
+	 pin3 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_3);
+	 pin4 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_4);
+	 pin5 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_5);
+	 pin6 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_6);
+	 pin7 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_7);
 	 lpt_data = GPIO_ReadOutputData(GPIOA);
-
+	 InByteState = InByte;
 }
 uint8_t state;
 uint16_t check_state(uint16_t pin){
@@ -163,15 +163,16 @@ uint16_t check_state(uint16_t pin){
 	return 0;
 	}else return 1;
 }
+
 void printByte(byte inByte) {
   while(check_state(GPIO_Pin_9) == 1) {
     // wait for busy to go low
   }
 
 
-
-  GPIO_Write(GPIOE, inByte);
-
+  //write character on data pins
+  GPIO_Write(GPIOA, inByte);
+  print_states(inByte);
   GPIO_SetBits(GPIOE,GPIO_Pin_10);
   //digitalWrite(nStrobe, LOW);       // strobe nStrobe to input data bits
 
@@ -197,7 +198,7 @@ void printMessage() {
     for(int cursorPosition = 0; cursorPosition < charsPerLine; cursorPosition++) {
       byte character = message[line][cursorPosition];
       printByte(character);
-      Delayms(1);
+      Delay(10);
     }
     printByte(10); // new line
     printByte(13); // carriage return
@@ -212,7 +213,7 @@ void printStartupMessage() {
     for(int cursorPosition = 0; cursorPosition < startup_charsPerLine; cursorPosition++) {
       byte character = startup_message[line][cursorPosition];
       printByte(character);
-            Delayms(1);
+            Delay(10);
     }
     printByte(10); // new line
     printByte(13); // carriage return
