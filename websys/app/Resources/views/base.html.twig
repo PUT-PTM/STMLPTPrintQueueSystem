@@ -7,7 +7,18 @@
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <div id="wrapper">
+            <header>
+                <h1>LPT Print Queue System</h1>
+                <p>Hello, {{ app.user.username }}! <a href="{{ path('fos_user_security_logout') }}">Log out</a>
+                {% if is_granted('ROLE_ADMIN') %} <a href="{{ path('admin_home') }}">Admin</a> {% endif %}
+                </p>
+            </header>
+            {% block body %}{% endblock %}
+            <footer>
+                <p>LPQS WebSystem Module</p>
+            </footer>
+        </div>
         {% block javascripts %}{% endblock %}
     </body>
 </html>
