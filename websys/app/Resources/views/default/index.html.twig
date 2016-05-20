@@ -3,18 +3,21 @@
 {% block body %}
     {% for flash_message in app.session.flashBag.get('notice') %}
         <div class="flash-notice">
+            <b>System message:</b><br/>
             {{ flash_message }}
         </div>
     {% endfor %}
     {% for flash_message in app.session.flashBag.get('error') %}
         <div class="flash-error">
+            <b>An error occured:</b><br/>
             {{ flash_message }}
         </div>
     {% endfor %}
+    <h2>What would you like to do?</h2>
     {% if curNum %}
         <p>Current number: {{ curNum.generatedNum }}</p>
-        <p><a href="{{ path('end_case') }}">End case</a></p>
+        <a href="{{ path('end_case') }}" class="caseop-btn">End case</a>
     {% else %}
-        <p><a href="{{ path('start_case') }}">Start next case</a></p>
+        <a href="{{ path('start_case') }}" class="caseop-btn">Start next case</a>
     {% endif %}
 {% endblock %}
