@@ -96,6 +96,14 @@ class DefaultController extends Controller
         }
         return $this->redirectToRoute('homepage');
     }
+    
+    /**
+     * @Route("/admin/", name="admin_home")
+     */
+    public function adminAction(Request $request)
+    {
+        return $this->render('admin/index.html.twig');
+    }
 
     private function getCurrentPetitioner()
     {

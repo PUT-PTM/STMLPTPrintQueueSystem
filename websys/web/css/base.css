@@ -53,8 +53,32 @@ footer {
 .caseop-btn {
     display: inline-block;
     padding: 15px;
-    background-color: #EFFDFF;
+    background-color: #effdff;
     color: #000;
     font-size: 18px;
     text-decoration: none;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table, th, td {
+   border: 1px solid black;
+}
+
+th {
+    background-color: #d1dbbd;
+}
+
+tr.even {
+    background-color: #e5f0cf;
+}
+
+tr.odd {
+    background-color: #fcfff5;
+}
+
+th, td {
+    padding: 3px 5px;
 }

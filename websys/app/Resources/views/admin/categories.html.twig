@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h2>Case Categories</h2>
+    {% if categories %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Shortcut</th>
+            </tr>
+        {% for category in categories %}
+            <tr class="{{ cycle(['odd', 'even'], loop.index0) }}">
+                <td>{{ category.id }}</td>
+                <td>{{ category.name }}</td>
+                <td>{{ category.shortcut }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% else %}
+        <p>No categories found!</p>
+    {% endif %}
+{% endblock %}
