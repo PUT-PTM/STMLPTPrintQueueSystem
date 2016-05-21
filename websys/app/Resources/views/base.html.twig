@@ -12,9 +12,11 @@
         <div id="wrapper">
             <header>
                 <h1>LPQS WebPanel</h1>
-                <p>Logged as <strong>{{ app.user.username }}</strong> | 
-                {% if is_granted('ROLE_ADMIN') %} <a href="{{ path('admin_home') }}">Admin</a> {% endif %}
-                <a href="{{ path('fos_user_security_logout') }}">Log out</a>
+                {% if app.user %}
+                    <p>Logged as <strong>{{ app.user.username }}</strong> | 
+                    {% if is_granted('ROLE_ADMIN') %} <a href="{{ path('admin_home') }}">Admin</a> {% endif %}
+                    <a href="{{ path('fos_user_security_logout') }}">Log out</a>
+                {% endif %}
                 </p>
             </header>
             <section id="maincontent">
