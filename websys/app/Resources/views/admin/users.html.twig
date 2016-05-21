@@ -36,5 +36,6 @@
     {% else %}
         <p>No users found, this shouldn't happened!</p>
     {% endif %}
+    <a href="{{ path('app_admin_users_new') }}">New user</a><br/>
     <a href="{{ path('admin_home') }}">Back to Admin Panel</a>
 {% endblock %}
