@@ -30,11 +30,7 @@ class CategoriesController extends Controller
         $em = $this->getDoctrine()->getManager();
         $category = new CaseCategory();
 
-        $form = $this->createFormBuilder($category)
-                ->add('name', TextType::class)
-                ->add('shortcut', TextType::class)
-                ->add('save', SubmitType::class, array('label' => 'Create Category'))
-                ->getForm();
+        $form = $this->getFormForCategory($category);
 
         $form->handleRequest($request);
 
@@ -46,6 +42,41 @@ class CategoriesController extends Controller
             return $this->redirectToRoute('app_admin_categories_show');
         }
 
-        return $this->render('admin/new_category.html.twig', array('form' => $form->createView()));
+        return $this->render('admin/category_new.html.twig', array('form' => $form->createView()));
+    }
+
+    /**
+     * @Route("/categories/edit/{id}")
+     */
+    public function editAction(Request $request, $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $category = $em->getRepository('AppBundle:CaseCategory')->findOneById($id);
+        if (!$category) {
+            throw $this->createNotFoundException('No category found for id: ' . $id);
+        }
+
+        $form = $this->getFormForCategory($category);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($category);
+            $em->flush();
+
+            $this->addFlash('notice', 'Edited category with id ' . $category->getId() . '!');
+            return $this->redirectToRoute('app_admin_categories_show');
+        }
+
+        return $this->render('admin/category_edit.html.twig', array('form' => $form->createView()));
+    }
+
+    private function getFormForCategory(CaseCategory $category)
+    {
+        return $this->createFormBuilder($category)
+               ->add('name', TextType::class)
+               ->add('shortcut', TextType::class)
+               ->add('save', SubmitType::class, array('label' => 'Save'))
+               ->getForm();
     }
 }

@@ -8,12 +8,14 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Shortcut</th>
+                <th>Operation</th>
             </tr>
         {% for category in categories %}
             <tr class="{{ cycle(['odd', 'even'], loop.index0) }}">
                 <td>{{ category.id }}</td>
                 <td>{{ category.name }}</td>
                 <td>{{ category.shortcut }}</td>
+                <td><a href="{{ path('app_admin_categories_edit', {'id': category.id}) }}">Edit</a></td>
             </tr>
         {% endfor %}
         </table>
