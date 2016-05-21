@@ -10,7 +10,7 @@
                 <th>Email</th>
                 <th>Last login</th>
                 <th>Roles</th>
-                <th>Locked</th>
+                <th>Lock?</th>
             </tr>
         {% for user in users %}
             <tr class="{{ cycle(['odd', 'even'], loop.index0) }}">
@@ -19,7 +19,17 @@
                 <td>{{ user.email }}</td>
                 <td>{{ user.lastLogin|date('d.m.Y H:m:s') }}</td>
                 <td>{{ user.roles|join(', ') }}</td>
-                <td>{{ user.locked ? 'Yes' : 'No' }}</td>
+                <td>
+                    {% if user.id == app.user.id %}
+                        ---
+                    {% else %}
+                        {% if user.locked %}
+                            <a href="{{ path('app_admin_users_unlock', {'id': user.id}) }}">Unlock</a>
+                        {% else %}
+                            <a href="{{ path('app_admin_users_lock', {'id': user.id}) }}">Lock</a>
+                        {% endif %}
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </table>
