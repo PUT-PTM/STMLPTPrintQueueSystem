@@ -8,17 +8,20 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Current Assingee</th>
+                <th>Operation</th>
             </tr>
         {% for pos in positions %}
             <tr class="{{ cycle(['odd', 'even'], loop.index0) }}">
                 <td>{{ pos.id }}</td>
                 <td>{{ pos.name }}</td>
-                <td>{{ pos.assignedUser.username }}</td>
+                <td>{{ pos.assignedUser ? pos.assignedUser.username : 'None' }}</td>
+                <td><a href="{{ path('app_admin_positions_edit', {'id' : pos.id}) }}">Edit</a></td>
             </tr>
         {% endfor %}
         </table>
     {% else %}
         <p>No positions found!</p>
     {% endif %}
+    <a href="{{ path('app_admin_positions_add') }}">New Position</a><br/>
     <a href="{{ path('admin_home') }}">Back to Admin Panel</a>
 {% endblock %}

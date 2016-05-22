@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h2>Edit Position</h2>
+    <p>ID: <b>{{ form.vars.value.id }}</b></p>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+    <a href="{{ path('app_admin_positions_show') }}">Back to positions list</a>
+{% endblock %}
