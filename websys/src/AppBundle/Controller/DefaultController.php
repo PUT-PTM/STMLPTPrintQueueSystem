@@ -11,7 +11,7 @@ class DefaultController extends Controller
     /**
      * @Route("/", name="homepage")
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         if(!$this->getUser()->getPosition()) {
             return $this->redirectToRoute('position_selector');
@@ -100,9 +100,15 @@ class DefaultController extends Controller
     /**
      * @Route("/admin/", name="admin_home")
      */
-    public function adminAction(Request $request)
+    public function adminAction()
     {
-        return $this->render('admin/index.html.twig');
+        $em = $this->getDoctrine()->getManager();
+
+        $statuses = $em->createQuery('SELECT s FROM AppBundle:Status s WHERE s.name != \'End\'')->getResult();
+        $currentNumbers = $em->getRepository('AppBundle:PetitionerNumber')
+                ->findBy(array('status' => $statuses), array('createdOn' => 'ASC'));
+
+        return $this->render('admin/index.html.twig', array('currentNumbers' => $currentNumbers));
     }
 
     private function getCurrentPetitioner()

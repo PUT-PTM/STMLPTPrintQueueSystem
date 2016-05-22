@@ -82,3 +82,7 @@ tr.odd {
 th, td {
     padding: 3px 5px;
 }
+
+h1 > a {
+    text-decoration: none;
+}

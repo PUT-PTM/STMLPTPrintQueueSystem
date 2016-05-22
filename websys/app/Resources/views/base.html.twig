@@ -11,7 +11,7 @@
     <body>
         <div id="wrapper">
             <header>
-                <h1>LPQS WebPanel</h1>
+                <h1><a href="{{ path('homepage') }}">LPQS WebPanel</a></h1>
                 {% if app.user %}
                     <p>Logged as <strong>{{ app.user.username }}</strong> | 
                     {% if is_granted('ROLE_ADMIN') %} <a href="{{ path('admin_home') }}">Admin</a> {% endif %}
