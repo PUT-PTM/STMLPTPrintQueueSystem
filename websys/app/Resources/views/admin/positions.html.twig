@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h2>Positions</h2>
+    {% if positions %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Current Assingee</th>
+            </tr>
+        {% for pos in positions %}
+            <tr class="{{ cycle(['odd', 'even'], loop.index0) }}">
+                <td>{{ pos.id }}</td>
+                <td>{{ pos.name }}</td>
+                <td>{{ pos.assignedUser.username }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% else %}
+        <p>No positions found!</p>
+    {% endif %}
+    <a href="{{ path('admin_home') }}">Back to Admin Panel</a>
+{% endblock %}
