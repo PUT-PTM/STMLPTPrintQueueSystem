@@ -37,6 +37,13 @@ class CaseCategory
     private $shortcut;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="active", type="boolean")
+     */
+    private $active;
+
+    /**
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="PetitionerNumber", mappedBy="caseCategory")
@@ -139,5 +146,29 @@ class CaseCategory
     public function getPetitionerNumbers()
     {
         return $this->petitionerNumbers;
+    }
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     *
+     * @return CaseCategory
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean
+     */
+    public function getActive()
+    {
+        return $this->active;
     }
 }

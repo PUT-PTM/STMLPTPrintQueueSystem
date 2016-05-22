@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class CategoriesController extends Controller
 {
@@ -35,6 +36,7 @@ class CategoriesController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $category->setActive(true);
             $em->persist($category);
             $em->flush();
 
@@ -56,7 +58,7 @@ class CategoriesController extends Controller
             throw $this->createNotFoundException('No category found for id: ' . $id);
         }
 
-        $form = $this->getFormForCategory($category);
+        $form = $this->getFormForCategory($category, true);
 
         $form->handleRequest($request);
 
@@ -71,12 +73,57 @@ class CategoriesController extends Controller
         return $this->render('admin/category_edit.html.twig', array('form' => $form->createView()));
     }
 
-    private function getFormForCategory(CaseCategory $category)
+    /**
+     * @Route("/categories/activate/{id}")
+     */
+    public function activateAction($id)
     {
-        return $this->createFormBuilder($category)
+        $em = $this->getDoctrine()->getManager();
+        $category = $em->getRepository('AppBundle:CaseCategory')->findOneById($id);
+        if (!$category) {
+            throw $this->createNotFoundException('No category found for id: ' . $id);
+        }
+        if ($category->getActive()) {
+            $this->addFlash('error', 'Category "' . $category->getName() . '" is already activated!');
+        } else {
+            $category->setActive(true);
+        }
+        $em->flush();
+        $this->addFlash('notice', 'Category "' . $category->getName() . '" activated sucessfully!');
+        return $this->redirectToRoute('app_admin_categories_show');
+    }
+
+    /**
+     * @Route("/categories/deactivate/{id}")
+     */
+    public function deactivateAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $category = $em->getRepository('AppBundle:CaseCategory')->findOneById($id);
+        if (!$category) {
+            throw $this->createNotFoundException('No category found for id: ' . $id);
+        }
+        if (!$category->getActive()) {
+            $this->addFlash('error', 'Category "' . $category->getName() . '" is already deactivated!');
+        } else {
+            $category->setActive(false);
+        }
+        $em->flush();
+        $this->addFlash('notice', 'Category "' . $category->getName() . '" deactivated sucessfully!');
+        return $this->redirectToRoute('app_admin_categories_show');
+    }
+
+    private function getFormForCategory(CaseCategory $category, $edit = false)
+    {
+        $formBuilder = $this->createFormBuilder($category)
                ->add('name', TextType::class)
-               ->add('shortcut', TextType::class)
-               ->add('save', SubmitType::class, array('label' => 'Save'))
-               ->getForm();
+               ->add('shortcut', TextType::class);
+        if ($edit) {
+            $formBuilder = $formBuilder->add('active', CheckboxType::class, array(
+                'required' => false,
+            ));
+        }
+        $formBuilder = $formBuilder->add('save', SubmitType::class, array('label' => 'Save'));
+        return $formBuilder->getForm();
     }
 }
