@@ -111,6 +111,19 @@ class DefaultController extends Controller
         return $this->render('admin/index.html.twig', array('currentNumbers' => $currentNumbers));
     }
 
+    /**
+     * @Route("/admin/history")
+     */
+    public function adminHistoryAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $numbers = $em->getRepository('AppBundle:PetitionerNumber')
+                ->findBy(array(), array('createdOn' => 'DESC'));
+
+        return $this->render('admin/history.html.twig', array('currentNumbers' => $numbers));
+    }
+
     private function getCurrentPetitioner()
     {
         $uid = $this->getUser()->getId();
