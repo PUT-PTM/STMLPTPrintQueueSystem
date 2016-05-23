@@ -4,33 +4,24 @@
 
 
 #include <stdio.h>
-//#include "tm_stm32f4_delay/tm_stm32f4_delay.h"
+#include "tm_stm32f4_delay/tm_stm32f4_delay.h"
 
-void Delay(int time){
-	for(int i=0; i<time*100000;i++);
-}
-
-void Delayms(int time){
-	for(int i=0; i<time*10000;i++);
-}
+//void Delay(int time){
+//	for(int i=0; i<time*1000000;i++);
+//}
+//
+//void Delayms(int time){
+//	for(int i=0; i<time*100000;i++);
+//}
 
 byte startup_message[startup_num_lines][startup_charsPerLine] = {
-  "This is the startup message. It prints whenever",
-  "the STM is reset.",
+  "Wiadomosc startowa",
+  "2 wiersz"
 };
 
 
-byte message[num_lines][charsPerLine] = {
-  "    ",   // blank line
-  "This is the normal message. It prints whenever",
-  "you connect pin 14 (analog 0) to GND.",
-  "  ",  // blank line
-  "------------------------------------------------------------------------------",   // a spiffy line
-  "1) More message content",
-  "  ",
-  "II) you can have up to about 80 chars per line ",
-  "  ",
-  "------------------------------------------------------------------------------",
+byte std_message[num_lines][charsPerLine] = {
+ "oj ktos zapomnial co chce drukowac"
 };
 
 // parallel port pin# = arduino pin#
@@ -49,8 +40,10 @@ byte message[num_lines][charsPerLine] = {
 
 void lpt_configure(){
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+
 
 
 
@@ -66,23 +59,33 @@ void lpt_configure(){
 		lpt_data_lines.GPIO_Speed = GPIO_Speed_50MHz;
 		GPIO_Init(GPIOA, &lpt_data_lines);
 
-//ack and busy input
-		GPIO_InitTypeDef lpt_states_lines;
+//ack input
+		GPIO_InitTypeDef lpt_ack_pin;
 				lpt_states_lines.GPIO_OType = GPIO_OType_PP;
 				lpt_states_lines.GPIO_PuPd = GPIO_PuPd_UP;
 				lpt_states_lines.GPIO_Mode = GPIO_Mode_IN;
-				lpt_states_lines.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
+				lpt_states_lines.GPIO_Pin = GPIO_Pin_8;
 				lpt_states_lines.GPIO_Speed = GPIO_Speed_50MHz;
-				GPIO_Init(GPIOE, &lpt_states_lines);
+				GPIO_Init(GPIOB, &lpt_ack_pin);
+//busy pin
+				GPIO_InitTypeDef lpt_busy_pin;
+						lpt_states_lines.GPIO_OType = GPIO_OType_PP;
+						lpt_states_lines.GPIO_PuPd = GPIO_PuPd_UP;
+						lpt_states_lines.GPIO_Mode = GPIO_Mode_IN;
+						lpt_states_lines.GPIO_Pin = GPIO_Pin_9;
+						lpt_states_lines.GPIO_Speed = GPIO_Speed_50MHz;
+						GPIO_Init(GPIOD, &lpt_busy_pin);
 
-//strobe pin
+
+
+//strobe
 		GPIO_InitTypeDef lpt_strobe_pin;
 				lpt_strobe_pin.GPIO_OType = GPIO_OType_PP;
-				lpt_strobe_pin.GPIO_PuPd = GPIO_PuPd_UP;
+				lpt_strobe_pin.GPIO_PuPd = GPIO_PuPd_DOWN;
 				lpt_strobe_pin.GPIO_Mode = GPIO_Mode_OUT;
 				lpt_strobe_pin.GPIO_Pin = GPIO_Pin_10;
 				lpt_strobe_pin.GPIO_Speed = GPIO_Speed_50MHz;
-				GPIO_Init(GPIOD, &lpt_strobe_pin);
+				GPIO_Init(GPIOE, &lpt_strobe_pin);
 
 }
 
@@ -111,7 +114,7 @@ void lpt_setup() {
 
 
   lpt_configure();
-  //Delayms(1000);
+  Delayms(1000);
 
   resetPrinter();
 
@@ -125,15 +128,15 @@ void lpt_setup() {
   //Serial.println("Startup complete");
 }
 
-void lpt_loop() {
-
-
-  resetPrinter();
-
-  printMessage();
-
-  resetPrinter();
-}
+//void lpt_loop() {
+//
+//
+//  resetPrinter();
+//
+//  printMessage();
+//
+//  resetPrinter();
+//}
 int pin0;
 int pin1;
 int pin2;
@@ -144,6 +147,9 @@ int pin6;
 int pin7;
 int lpt_data;
 byte InByteState;
+int strobeState;
+int ackState;
+int busyState;
 void print_states(byte InByte){
 	 pin0 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
 	 pin1 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_1);
@@ -155,20 +161,25 @@ void print_states(byte InByte){
 	 pin7 = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_7);
 	 lpt_data = GPIO_ReadOutputData(GPIOA);
 	 InByteState = InByte;
+
+	 busyState = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_8);
+	 ackState = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_9);
+
 }
-uint8_t state;
+uint8_t busy;
 uint16_t check_state(uint16_t pin){
-	 state = GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_9);
-	if(state == 1){
-	return 0;
-	}else return 1;
+	 busy = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_9);
+	if(busy == 0){
+	return 1;
+	}else return 0;
 }
 
 void printByte(byte inByte) {
-  while(check_state(GPIO_Pin_9) == 1) {
+  while(check_state(GPIO_Pin_9)) {
     // wait for busy to go low
+	  set_orange_led_on();
   }
-
+  set_orange_led_off();
 
   //write character on data pins
   GPIO_Write(GPIOA, inByte);
@@ -180,9 +191,11 @@ void printByte(byte inByte) {
  // digitalWrite(nStrobe, HIGH);
   GPIO_ResetBits(GPIOE,GPIO_Pin_10);
 
-  while(check_state(GPIO_Pin_9) == 1) {
+  while(check_state(GPIO_Pin_9)) {
     // wait for busy line to go low
+	  set_orange_led_on();
   }
+  set_orange_led_off();
 }
 
 void resetPrinter() {
@@ -192,16 +205,21 @@ void resetPrinter() {
   //Serial.println("Printer Reset");
 }
 
-void printMessage() {
+void printMessage(byte *message) {
   //digitalWrite(13, HIGH);
+	if(!message){
+		message = std_message;
+	}
   for(int line = 0; line < num_lines; line++) {
     for(int cursorPosition = 0; cursorPosition < charsPerLine; cursorPosition++) {
-      byte character = message[line][cursorPosition];
+      byte character = (&message)[line][cursorPosition];
       printByte(character);
       Delay(10);
     }
     printByte(10); // new line
+    Delay(10);
     printByte(13); // carriage return
+    Delay(10);
   }
   //digitalWrite(13,LOW);
 }
@@ -209,11 +227,18 @@ void printMessage() {
 void printStartupMessage() {
   //Serial.println("Print start-up mssage");
  // digitalWrite(13, HIGH);
+
+	//printByte(2);//start of text
+	printByte(10);
+	printByte(10);
+	printByte(10);
+	printByte(10);
+
   for(int line = 0; line < startup_num_lines; line++) {
     for(int cursorPosition = 0; cursorPosition < startup_charsPerLine; cursorPosition++) {
       byte character = startup_message[line][cursorPosition];
       printByte(character);
-            Delay(10);
+            Delay(4);
     }
     printByte(10); // new line
     printByte(13); // carriage return
@@ -221,6 +246,7 @@ void printStartupMessage() {
     //Serial.print(line);
     //Serial.println(" printed.");
   }
+ //printByte(3);//end of text
   //Serial.println("Startup message printed");
  // digitalWrite(13,LOW);
 }

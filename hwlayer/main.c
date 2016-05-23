@@ -8,12 +8,12 @@ extern volatile RcvBuff uart_buffer;
 int main(void)
 {
 	SystemInit();
-
+	TM_DELAY_Init();
 	usart_configure();
 	discovery_led_configure();
 
 	lpt_setup();
-	lpt_loop();
+	//lpt_loop();
 
 	uint8_t ok = 0;
 	if(establish_connection()) {
@@ -21,7 +21,12 @@ int main(void)
 		set_green_led_on();
 	} else {
 		set_red_led_on();
+		byte msg = &uart_buffer.buffer;
+		resetPrinter();
+		printMessage(msg);
+		resetPrinter();
 	}
+
 
 	while(ok)
 	{

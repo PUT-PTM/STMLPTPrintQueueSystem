@@ -7,10 +7,10 @@ extern volatile RcvBuff uart_buffer;
 
 uint8_t establish_connection()
 {
-	send_string("HELLO STM");
+	send_string("AT");
 	while(!uart_buffer.ready) {}
 	RcvBuffReset(&uart_buffer);
-	if(!strcmp(uart_buffer.buffer, "HELLO PI")) {
+	if(!strcmp(uart_buffer.buffer, "OK")) {
 		return 1;
 	} else {
 		return 0;

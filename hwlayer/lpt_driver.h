@@ -4,13 +4,13 @@ typedef uint8_t byte;
 
 // this is the max # of chars per line
 #define startup_charsPerLine 80
-#define startup_num_lines  2
+#define startup_num_lines  10
 #define charsPerLine  80
 #define num_lines 10
 #define strobeWait 2
 
 byte startup_message[startup_num_lines][startup_charsPerLine];
-byte message[num_lines][charsPerLine];
+byte std_message[num_lines][charsPerLine];
 
 GPIO_InitTypeDef lpt_data_lines;
 GPIO_InitTypeDef lpt_states_lines;//ack and busy
@@ -23,6 +23,6 @@ void lpt_setup();
 uint16_t check_state(uint16_t pin);
 void printByte(byte inByte);
 void resetPrinter();
-void printMessage();
+void printMessage(byte *message);
 void printStartupMessage();
 
