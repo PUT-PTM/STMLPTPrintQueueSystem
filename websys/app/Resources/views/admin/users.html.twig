@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h2>User Management</h2>
+    {% if users %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Last login</th>
+                <th>Roles</th>
+                <th>Lock?</th>
+            </tr>
+        {% for user in users %}
+            <tr class="{{ cycle(['odd', 'even'], loop.index0) }}">
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.lastLogin|date('d.m.Y H:m:s') }}</td>
+                <td>{{ user.roles|join(', ') }}</td>
+                <td>
+                    {% if user.id == app.user.id %}
+                        ---
+                    {% else %}
+                        {% if user.locked %}
+                            <a href="{{ path('app_admin_users_unlock', {'id': user.id}) }}">Unlock</a>
+                        {% else %}
+                            <a href="{{ path('app_admin_users_lock', {'id': user.id}) }}">Lock</a>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% else %}
+        <p>No users found, this shouldn't happened!</p>
+    {% endif %}
+    <a href="{{ path('app_admin_users_new') }}">New user</a><br/>
+    <a href="{{ path('admin_home') }}">Back to Admin Panel</a>
+{% endblock %}

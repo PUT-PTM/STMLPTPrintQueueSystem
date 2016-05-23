@@ -1,9 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div id="wrapper">
-    <h1>LPT Print Queue System &mdash; Choose your position</h1>
-    <p>Hello, {{ app.user.username }}! Please select your position:</p>
+    <p>Please select your position:</p>
     {% if positions %}
         <form method="POST" action="">
             <select name="position">
@@ -17,5 +15,4 @@
         <p>All positions are occupied. Please try again later.<br />
         <a href="{{ path('fos_user_security_logout') }}">Log out</a></p>
     {% endif %}
-</div>
 {% endblock %}

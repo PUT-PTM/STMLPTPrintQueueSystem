@@ -11,7 +11,7 @@ class DefaultController extends Controller
     /**
      * @Route("/", name="homepage")
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         if(!$this->getUser()->getPosition()) {
             return $this->redirectToRoute('position_selector');
@@ -95,6 +95,33 @@ class DefaultController extends Controller
             $this->addFlash('notice', 'Petitioner case closed successfully!');
         }
         return $this->redirectToRoute('homepage');
+    }
+    
+    /**
+     * @Route("/admin/", name="admin_home")
+     */
+    public function adminAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $statuses = $em->createQuery('SELECT s FROM AppBundle:Status s WHERE s.name != \'End\'')->getResult();
+        $currentNumbers = $em->getRepository('AppBundle:PetitionerNumber')
+                ->findBy(array('status' => $statuses), array('createdOn' => 'ASC'));
+
+        return $this->render('admin/index.html.twig', array('currentNumbers' => $currentNumbers));
+    }
+
+    /**
+     * @Route("/admin/history")
+     */
+    public function adminHistoryAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $numbers = $em->getRepository('AppBundle:PetitionerNumber')
+                ->findBy(array(), array('createdOn' => 'DESC'));
+
+        return $this->render('admin/history.html.twig', array('currentNumbers' => $numbers));
     }
 
     private function getCurrentPetitioner()

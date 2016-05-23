@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h2>History</h2>
+    <table>
+        <tr>
+            <th>Queue number</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Assigned User</th>
+            <th>Created on</th>
+            <th>Updated on</th>
+            <th>Position</th>
+        </tr>
+        {% for num in currentNumbers %}
+            <tr class="{{ cycle(['odd', 'even'], loop.index0) }}">
+                <td>{{ num.generatedNum }}</td>
+                <td>{{ num.caseCategory.name }}</td>
+                <td>{{ num.status.name }}</td>
+                <td>{{ num.assignedUser ? num.assignedUser.username : 'None' }}</td>
+                <td>{{ num.createdOn|date('d.m.Y H:m:s') }}</td>
+                <td>{{ num.updatedOn|date('d.m.Y H:m:s') }}</td>
+                <td>{{ num.position ? num.position.name : 'None' }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <a href="{{ path('admin_home') }}">Back to Admin Panel</a>
+{% endblock %}

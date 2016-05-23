@@ -3,11 +3,41 @@
     <head>
         <meta charset="UTF-8" />
         <title>{% block title %}Welcome{% endblock %} &mdash; LPT Print Queue System</title>
-        {% block stylesheets %}{% endblock %}
+        {% block stylesheets %}
+            <link rel="stylesheet" type="text/css" href="{{ asset('css/base.css') }}" />
+        {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <div id="wrapper">
+            <header>
+                <h1><a href="{{ path('homepage') }}">LPQS WebPanel</a></h1>
+                {% if app.user %}
+                    <p>Logged as <strong>{{ app.user.username }}</strong> | 
+                    {% if is_granted('ROLE_ADMIN') %} <a href="{{ path('admin_home') }}">Admin</a> {% endif %}
+                    <a href="{{ path('fos_user_security_logout') }}">Log out</a>
+                {% endif %}
+                </p>
+            </header>
+            <section id="maincontent">
+                {% for flash_message in app.session.flashBag.get('notice') %}
+                    <div class="flash-notice">
+                        <b>System message:</b><br/>
+                        {{ flash_message }}
+                    </div>
+                {% endfor %}
+                {% for flash_message in app.session.flashBag.get('error') %}
+                    <div class="flash-error">
+                        <b>An error occured:</b><br/>
+                        {{ flash_message }}
+                    </div>
+                {% endfor %}
+                {% block body %}{% endblock %}
+            </section>
+            <footer>
+                <p>LPQS WebSystem Module</p>
+            </footer>
+        </div>
         {% block javascripts %}{% endblock %}
     </body>
 </html>

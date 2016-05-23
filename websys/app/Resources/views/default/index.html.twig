@@ -1,28 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div id="wrapper">
-    <h1>LPT Print Queue System &mdash; Welcome</h1>
-    <p>Hello, {{ app.user.username }}! <a href="{{ path('fos_user_security_logout') }}">Log out</a></p>
-    {% for flash_message in app.session.flashBag.get('notice') %}
-        <div class="flash-notice">
-            {{ flash_message }}
-        </div>
-    {% endfor %}
-    {% for flash_message in app.session.flashBag.get('error') %}
-        <div class="flash-error">
-            {{ flash_message }}
-        </div>
-    {% endfor %}
+    <h2>What would you like to do?</h2>
     {% if curNum %}
         <p>Current number: {{ curNum.generatedNum }}</p>
-        <p><a href="{{ path('end_case') }}">End case</a></p>
+        <a href="{{ path('end_case') }}" class="caseop-btn">End case</a>
     {% else %}
-        <p><a href="{{ path('start_case') }}">Start next case</a></p>
+        <a href="{{ path('start_case') }}" class="caseop-btn">Start next case</a>
     {% endif %}
-    <p>Select an option:</p>
-    <ul>
-        <li><a href="{{ path('app_casecategories_list') }}">Categories list</a></li>
-    </ul>
-</div>
 {% endblock %}

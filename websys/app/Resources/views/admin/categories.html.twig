@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h2>Case Categories</h2>
+    {% if categories %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Shortcut</th>
+                <th>Active?</th>
+                <th>Operation</th>
+            </tr>
+        {% for category in categories %}
+            <tr class="{{ cycle(['odd', 'even'], loop.index0) }}">
+                <td>{{ category.id }}</td>
+                <td>{{ category.name }}</td>
+                <td>{{ category.shortcut }}</td>
+                <td>{{ category.active ? 'Yes' : 'No' }}</td>
+                <td><a href="{{ path('app_admin_categories_edit', {'id': category.id}) }}">Edit</a> | 
+                {% if category.active %}
+                    <a href="{{ path('app_admin_categories_deactivate', {'id': category.id}) }}">Deactivate</a>
+                {% else %}
+                    <a href="{{ path('app_admin_categories_activate', {'id': category.id}) }}">Activate</a>
+                {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% else %}
+        <p>No categories found!</p>
+    {% endif %}
+    <a href="{{ path('app_admin_categories_add') }}">Add category</a><br/>
+    <a href="{{ path('admin_home') }}">Back to Admin Panel</a>
+{% endblock %}
