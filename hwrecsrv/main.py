@@ -1,14 +1,21 @@
-import uartcomm
+from dblogic import DatabaseLogic
 import sys
 
 def main():
-    uart = uartcomm.UARTCommunicator()
-    if uart.establishConnection():
-        print("Connected with STM board!")
-        uart.dummyCommunication()
+    dbl = DatabaseLogic()
+
+    print('--- LPQS Temporary Menu ---')
+    categories = dbl.getCategories()
+
+    for cat in categories:
+        print(cat)
+
+    x = input('Category ID: ')
+    num = dbl.getLastPetitionerNumberForCategory(x)
+    if num != None:
+        print("Last number " + num[0])
     else:
-        print("An error occured during establishing connection!")
-        return 1
+        print("No number for this category, yet.")
 
     return 0
 
