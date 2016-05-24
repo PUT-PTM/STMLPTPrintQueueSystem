@@ -4,7 +4,7 @@ typedef uint8_t byte;
 
 // this is the max # of chars per line
 #define startup_charsPerLine 80
-#define startup_num_lines  10
+#define startup_num_lines  2
 #define charsPerLine  80
 #define num_lines 10
 #define strobeWait 2

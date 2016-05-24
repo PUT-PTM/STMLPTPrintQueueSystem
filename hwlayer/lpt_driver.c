@@ -15,8 +15,8 @@
 //}
 
 byte startup_message[startup_num_lines][startup_charsPerLine] = {
-  "Wiadomosc startowa",
-  "2 wiersz"
+  "w",
+  "s"
 };
 
 
@@ -24,28 +24,12 @@ byte std_message[num_lines][charsPerLine] = {
  "oj ktos zapomnial co chce drukowac"
 };
 
-// parallel port pin# = arduino pin#
-//const int nStrobe = 2;
-//const int data_0 = 3;
-//const int data_1 = 4;
-//const int data_2 = 5;
-//const int data_3 = 6;
-//const int data_4 = 7;
-//const int data_5 = 8;
-//const int data_6 = 9;
-//const int data_7 = 10;
-//const int nAck = 11;
-//const int busy = 12;
-
 
 void lpt_configure(){
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
-
-
-
 
 		// GPIO Pins configuration
 
@@ -94,25 +78,6 @@ void lpt_setup() {
 
 
 
- // pinMode(nStrobe, OUTPUT);      // is active LOW
-//  digitalWrite(nStrobe, HIGH);   // set HIGH
-//  pinMode(data_0, OUTPUT);
-//  pinMode(data_1, OUTPUT);
-//  pinMode(data_2, OUTPUT);
-//  pinMode(data_3, OUTPUT);
-//  pinMode(data_4, OUTPUT);
-//  pinMode(data_5, OUTPUT);
-//  pinMode(data_6, OUTPUT);
-//  pinMode(data_7, OUTPUT);
-
-//  pinMode(nAck, INPUT);     // is active LOW
-//  pinMode(busy, INPUT);
-
-//  pinMode(13, OUTPUT);
-//  pinMode(14, INPUT);   // analog pin 0 on duemilanove and uno
-//  digitalWrite(14, HIGH); // enable pull-up
-
-
   lpt_configure();
   Delayms(1000);
 
@@ -122,10 +87,9 @@ void lpt_setup() {
 
   resetPrinter();
 
-  //Serial.println("Delayms for 5 sec");
   Delayms(500);
 
-  //Serial.println("Startup complete");
+
 }
 
 //void lpt_loop() {
@@ -175,15 +139,16 @@ uint16_t check_state(uint16_t pin){
 }
 
 void printByte(byte inByte) {
+	set_orange_led_on();
   while(check_state(GPIO_Pin_9)) {
     // wait for busy to go low
-	  set_orange_led_on();
+	  set_orange_led_off();
   }
-  set_orange_led_off();
+  set_orange_led_on();
 
   //write character on data pins
   GPIO_Write(GPIOA, inByte);
-  print_states(inByte);
+  //print_states(inByte);
   GPIO_SetBits(GPIOE,GPIO_Pin_10);
   //digitalWrite(nStrobe, LOW);       // strobe nStrobe to input data bits
 
@@ -193,9 +158,9 @@ void printByte(byte inByte) {
 
   while(check_state(GPIO_Pin_9)) {
     // wait for busy line to go low
-	  set_orange_led_on();
+	  set_orange_led_off();
   }
-  set_orange_led_off();
+  set_orange_led_on();
 }
 
 void resetPrinter() {
@@ -210,6 +175,7 @@ void printMessage(byte *message) {
 	if(!message){
 		message = std_message;
 	}
+	sizeof(message);
   for(int line = 0; line < num_lines; line++) {
     for(int cursorPosition = 0; cursorPosition < charsPerLine; cursorPosition++) {
       byte character = (&message)[line][cursorPosition];

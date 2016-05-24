@@ -28,7 +28,7 @@ void usart_configure()
 
 	// UART parameters setup
 	USART_InitTypeDef usart;
-	usart.USART_BaudRate = 9600;
+	usart.USART_BaudRate =9600;
 	usart.USART_WordLength = USART_WordLength_8b;
 	usart.USART_StopBits = USART_StopBits_1;
 	usart.USART_Parity = USART_Parity_No;
@@ -61,7 +61,7 @@ void send_char(char c)
 void send_string(const char* s)
 {
 	while(*s) send_char(*s++);
-	send_char('\n');
+	send_char('\r\n');
 }
 
 void RcvBuffReset(volatile RcvBuff* buffer)
@@ -75,7 +75,7 @@ void UART4_IRQHandler(void)
 	if (USART_GetITStatus(UART4, USART_IT_RXNE) != RESET)
 	{
 		if(uart_buffer.ready == 0) {
-			if(UART4->DR == '\n') {
+			if(UART4->DR == '\r\n') {
 				uart_buffer.ready = 1;
 				uart_buffer.buffer[uart_buffer.current_pos] = '\0';
 			} else {

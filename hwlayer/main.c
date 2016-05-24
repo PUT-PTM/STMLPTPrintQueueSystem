@@ -3,6 +3,7 @@
 #include "usart_protocol.h"
 #include "led_indicators.h"
 #include "lpt_driver.h"
+//#include "tm_stm32f4_delay/tm_stm32f4_delay.h"
 extern volatile RcvBuff uart_buffer;
 
 int main(void)
@@ -16,17 +17,23 @@ int main(void)
 	//lpt_loop();
 
 	uint8_t ok = 0;
+	while(ok==0){
 	if(establish_connection()) {
 		ok = 1;
 		set_green_led_on();
+		//byte *msg = &uart_buffer.buffer;
+			resetPrinter();
+			printMessage(uart_buffer.buffer);
+			resetPrinter();
 	} else {
 		set_red_led_on();
-		byte msg = &uart_buffer.buffer;
+		//byte *msg = &uart_buffer.buffer;
 		resetPrinter();
-		printMessage(msg);
+		printMessage(uart_buffer.buffer);
 		resetPrinter();
 	}
 
+	}
 
 	while(ok)
 	{
