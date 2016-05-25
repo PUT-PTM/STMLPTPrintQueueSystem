@@ -63,3 +63,6 @@
 /hwlayer/hwlayer/*
 *.cogui
 *.comarker
+
+# Qt User Project
+*.pro.user
