@@ -3,6 +3,7 @@
 namespace AppBundle\Controller\Admin;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -14,6 +15,7 @@ class UsersController extends Controller
 {
     /**
      * @Route("/users")
+     * @Method({"GET"})
      */
     public function showAction()
     {
@@ -25,6 +27,7 @@ class UsersController extends Controller
 
     /**
      * @Route("/users/lock/{id}")
+     * @Method({"GET"})
      */
     public function lockAction($id)
     {
@@ -45,6 +48,7 @@ class UsersController extends Controller
 
     /**
      * @Route("/users/unlock/{id}")
+     * @Method({"GET"})
      */
     public function unlockAction($id)
     {
@@ -61,6 +65,7 @@ class UsersController extends Controller
 
     /**
      * @Route("/users/new")
+     * @Method({"GET", "POST"})
      */
     public function newAction(Request $request)
     {

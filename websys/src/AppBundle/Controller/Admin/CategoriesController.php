@@ -4,6 +4,7 @@ namespace AppBundle\Controller\Admin;
 
 use AppBundle\Entity\CaseCategory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -14,6 +15,7 @@ class CategoriesController extends Controller
 {
     /**
      * @Route("/categories")
+     * @Method({"GET"})
      */
     public function showAction()
     {
@@ -25,6 +27,7 @@ class CategoriesController extends Controller
 
     /**
      * @Route("/categories/add")
+     * @Method({"GET", "POST"})
      */
     public function addAction(Request $request)
     {
@@ -49,6 +52,7 @@ class CategoriesController extends Controller
 
     /**
      * @Route("/categories/edit/{id}")
+     * @Method({"GET", "POST"})
      */
     public function editAction(Request $request, $id)
     {
@@ -75,6 +79,7 @@ class CategoriesController extends Controller
 
     /**
      * @Route("/categories/activate/{id}")
+     * @Method({"GET"})
      */
     public function activateAction($id)
     {
@@ -95,6 +100,7 @@ class CategoriesController extends Controller
 
     /**
      * @Route("/categories/deactivate/{id}")
+     * @Method({"GET"})
      */
     public function deactivateAction($id)
     {

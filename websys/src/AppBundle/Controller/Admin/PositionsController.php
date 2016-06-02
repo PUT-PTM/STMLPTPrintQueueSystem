@@ -4,6 +4,7 @@ namespace AppBundle\Controller\Admin;
 
 use AppBundle\Entity\Position;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -13,6 +14,7 @@ class PositionsController extends Controller
 {
     /**
      * @Route("/positions")
+     * @Method({"GET"})
      */
     public function showAction()
     {
@@ -25,6 +27,7 @@ class PositionsController extends Controller
 
     /**
      * @Route("/positions/add")
+     * @Method({"GET", "POST"})
      */
     public function addAction(Request $request)
     {
@@ -48,6 +51,7 @@ class PositionsController extends Controller
 
     /**
      * @Route("/positions/edit/{id}")
+     * @Method({"GET", "POST"})
      */
     public function editAction(Request $request, $id)
     {

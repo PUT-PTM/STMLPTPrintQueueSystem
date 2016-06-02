@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -10,6 +11,7 @@ class DefaultController extends Controller
 {
     /**
      * @Route("/", name="homepage")
+     * @Method({"GET"})
      */
     public function indexAction()
     {
@@ -22,6 +24,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/position", name="position_selector")
+     * @Method({"GET", "POST"})
      */
     public function positionAction(Request $request)
     {
@@ -39,6 +42,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/start", name="start_case")
+     * @Method({"GET"})
      */
     public function startCaseAction()
     {
@@ -71,6 +75,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/end", name="end_case")
+     * @Method({"GET"})
      */
     public function endCaseAction()
     {
@@ -96,9 +101,10 @@ class DefaultController extends Controller
         }
         return $this->redirectToRoute('homepage');
     }
-    
+
     /**
      * @Route("/admin/", name="admin_home")
+     * @Method({"GET"})
      */
     public function adminAction()
     {
@@ -113,6 +119,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/admin/history")
+     * @Method({"GET"})
      */
     public function adminHistoryAction()
     {
