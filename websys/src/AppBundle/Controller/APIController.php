@@ -23,6 +23,7 @@ class APIController extends Controller {
             JOIN pn.position p
             JOIN pn.status s
             WHERE s.name = 'In Progress'
+            ORDER BY pn.createdOn DESC
 QRY
         );
         return new JsonResponse($query->getResult());

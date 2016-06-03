@@ -19,12 +19,20 @@
         </div>
         {% block javascripts %}
             <script>
-                $.getJSON( "/api/current", function( data ) {
-                    $.each(data, function (key, value) {
-                        html = '<div class="nmb"><h3>' + value.generatedNum + '</h3>'
-                            + '<p>' + value.name + '</p></div>';
-                        $( html ).appendTo("#maincontent");
+                function refreshNumbers() {
+                    $("#maincontent").empty();
+                    $.getJSON( "/api/current", function( data ) {
+                        $.each(data, function (key, value) {
+                            html = '<div class="nmb"><h3>' + value.generatedNum + '</h3>'
+                                + '<p>' + value.name + '</p></div>';
+                            $( html ).appendTo("#maincontent");
+                        });
                     });
+                    setTimeout(refreshNumbers, 5000);
+                }
+
+                $(document).ready(function() {
+                    setTimeout(refreshNumbers, 5000);
                 });
             </script>
         {% endblock %}
