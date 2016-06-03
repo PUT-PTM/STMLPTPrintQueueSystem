@@ -131,6 +131,15 @@ class DefaultController extends Controller
         return $this->render('admin/history.html.twig', array('currentNumbers' => $numbers));
     }
 
+    /**
+     * @Route("/live")
+     * @Method({"GET"})
+     */
+    public function liveViewAction()
+    {
+        return $this->render('live.html.twig');
+    }
+
     private function getCurrentPetitioner()
     {
         $uid = $this->getUser()->getId();
