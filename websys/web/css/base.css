@@ -86,3 +86,16 @@ th, td {
 h1 > a {
     text-decoration: none;
 }
+
+div.nmb:first-child {
+    font-size: 2em;
+    text-align: center;
+    display: block;
+    background-color: #ffa;
+}
+
+div.nmb {
+    font-size: 1.5em;
+    display: inline-block;
+    background-color: #fff;
+}

@@ -15,16 +15,17 @@
                 <h1>Current Numbers</h1>
             </header>
             <section id="maincontent">
+                <p>Loading data from server...</p>
             </section>
         </div>
         {% block javascripts %}
             <script>
                 function refreshNumbers() {
-                    $("#maincontent").empty();
                     $.getJSON( "/api/current", function( data ) {
+                        $("#maincontent").empty();
                         $.each(data, function (key, value) {
-                            html = '<div class="nmb"><h3>' + value.generatedNum + '</h3>'
-                                + '<p>' + value.name + '</p></div>';
+                            var html = '<div class="nmb"><h3>' + value.generatedNum + '</h3>'
+                                + '<p>Stanowisko:' + value.name + '</p></div>';
                             $( html ).appendTo("#maincontent");
                         });
                     });
@@ -32,7 +33,7 @@
                 }
 
                 $(document).ready(function() {
-                    setTimeout(refreshNumbers, 5000);
+                    refreshNumbers();
                 });
             </script>
         {% endblock %}
