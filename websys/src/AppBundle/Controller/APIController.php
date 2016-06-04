@@ -55,6 +55,22 @@ QRY
         }
     }
 
+    /**
+     * @Route("/api/camount")
+     * @Method({"GET"})
+     */
+    public function getCategoriesAmount() {
+        $em = $this->getDoctrine()->getManager();
+
+        $query = $em->createQueryBuilder()
+            ->select('COUNT(c.id)')
+            ->from('AppBundle:CaseCategory', 'c')
+            ->getQuery();
+        $total = $query->getSingleScalarResult();
+
+        return new JsonResponse(array('amount' => (int)$total));
+    }
+
     private function generateNewPetitionerNumber(CaseCategory $category) {
         $em = $this->getDoctrine()->getManager();
         $status = $em->getRepository('AppBundle:Status')->getNewStatus();
