@@ -10,30 +10,29 @@ uint8_t establish_connection()
 {
 
 	for(int i=0; i<2;i++){
-		send_string("AT");
+		send_string("AT+CWJAP?");
 
-		set_green_led_on();
-			Delayms(50);
-
+	//set_green_led_on();
 	while(!uart_buffer.ready) {}
 	RcvBuffReset(&uart_buffer);
-	set_green_led_off();
-	if(!strstr(uart_buffer.buffer, "\r\nOK")) {
-		set_blue_led_on(); //blue led will tell - wifi on and connected
-		set_green_led_on();
+
+	if(!strstr(uart_buffer.buffer, "OK")) {
+		set_green_led_off();
+		set_blue_led_on();
+
 		return 1;
 	}
 	else if(!strcmp(uart_buffer.buffer, "ERROR")){
-		set_blue_led_on(); //blue led will tell - wifi on and connected
+
 		set_red_led_on();
 
 	}
 	else {
-		Delayms(5000);
+		Delayms(500);
 		send_string("AT+RST");
 
 		//connection_error("Can't check connection to ESP8266 WIFI with command \"AT\" ");
-		set_blue_led_off();
+		//set_blue_led_off();
 		set_red_led_on();
 		set_orange_led_on();
 

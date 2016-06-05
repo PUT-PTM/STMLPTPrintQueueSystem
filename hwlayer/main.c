@@ -23,13 +23,22 @@ int main(void)
 	if(establish_connection()) {
 		ok = 1;
 		set_green_led_on();
+		//if(uart_buffer.ready == 1) {
+
+					send_string("AT+CIPSTART=0,\"TCP\",\"192.168.0.108\",80");
+					send_string('AT+CIPSEND=0,69');
+					send_string('GET \/ HTTP\/1.0 HOST: 192.168.0.108 Connection: keep-alive Accept: *\/*');
+					set_orange_led_on();
+					RcvBuffReset(&uart_buffer);
+		//}
+
 		//byte *msg = &uart_buffer.buffer;
 //			resetPrinter();
 //			printMessage(uart_buffer.buffer);
 //			resetPrinter();
 	} else {
 		set_red_led_on();
-		set_green_led_on();
+		//set_green_led_on();
 		//byte *msg = &uart_buffer.buffer;
 //		resetPrinter();
 //		printMessage(uart_buffer.buffer);

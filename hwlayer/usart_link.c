@@ -76,12 +76,17 @@ void UART4_IRQHandler(void)
 	if (USART_GetITStatus(UART4, USART_IT_RXNE) != RESET)
 	{
 		if(uart_buffer.ready == 0) {
-			if(UART4->DR == '\r\n') {
+			if( UART4->DR == '\n' && uart_buffer.buffer[uart_buffer.current_pos-1] == '\r') {
 				uart_buffer.ready = 1;
+				uart_buffer.buffer[uart_buffer.current_pos-1] = '\0';
 				uart_buffer.buffer[uart_buffer.current_pos] = '\0';
+
 			} else {
 				uart_buffer.buffer[uart_buffer.current_pos++] = UART4->DR;
+				uart_buffer.ready = 0;
 			}
 		}
+
+
 	}
 }
