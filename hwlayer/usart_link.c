@@ -61,7 +61,8 @@ void send_char(char c)
 void send_string(const char* s)
 {
 	while(*s) send_char(*s++);
-	send_char('\r\n');
+	send_char('\r');
+	send_char('\n');
 }
 
 void RcvBuffReset(volatile RcvBuff* buffer)

@@ -6,6 +6,8 @@
 //#include "tm_stm32f4_delay/tm_stm32f4_delay.h"
 extern volatile RcvBuff uart_buffer;
 
+char *error;
+
 int main(void)
 {
 	SystemInit();
@@ -13,24 +15,25 @@ int main(void)
 	usart_configure();
 	discovery_led_configure();
 
-	lpt_setup();
+//	lpt_setup();
 	//lpt_loop();
 
 	uint8_t ok = 0;
-	while(ok==0){
+	while(ok!=1){
 	if(establish_connection()) {
 		ok = 1;
 		set_green_led_on();
 		//byte *msg = &uart_buffer.buffer;
-			resetPrinter();
-			printMessage(uart_buffer.buffer);
-			resetPrinter();
+//			resetPrinter();
+//			printMessage(uart_buffer.buffer);
+//			resetPrinter();
 	} else {
 		set_red_led_on();
+		set_green_led_on();
 		//byte *msg = &uart_buffer.buffer;
-		resetPrinter();
-		printMessage(uart_buffer.buffer);
-		resetPrinter();
+//		resetPrinter();
+//		printMessage(uart_buffer.buffer);
+//		resetPrinter();
 	}
 
 	}
