@@ -6,6 +6,7 @@
 #include "stm32f4xx_exti.h"
 #include "usart_link.h"
 #include "led_indicators.h"
+#include "tm_stm32f4_delay.h"
 
 extern volatile RcvBuff uart_buffer;
 
@@ -100,30 +101,68 @@ void send_string(const char* s)
 	send_char('\r');
 	send_char('\n');
 }
-
+void send_string_2(const char* s)
+{
+	while(*s) send_char_2(*s++);
+	send_char_2('\r');
+	send_char_2('\n');
+}
 void RcvBuffReset(volatile RcvBuff* buffer)
 {
-	buffer->ready = 0;
+
 	buffer->current_pos = 0;
+	for(int i=0; i<255; i++){
+	buffer->buffer[i] = 0;
+	}
+	//set ready , new data can be write to it
+	buffer->ready = 1;
 }
 
 void UART4_IRQHandler(void)
 {
 	if (USART_GetITStatus(UART4, USART_IT_RXNE) != RESET)
 	{
-		send_char_2(UART4->DR);
-		if(uart_buffer.ready == 0) {
-			if( UART4->DR == '\n' && uart_buffer.buffer[uart_buffer.current_pos-1] == '\r') {
-				uart_buffer.ready = 1;
-				uart_buffer.buffer[uart_buffer.current_pos-1] = '\0';
-				uart_buffer.buffer[uart_buffer.current_pos] = '\0';
 
+		// receiving data, so we can't write to it
+		if(uart_buffer.ready == 0) {
+//send_string_2("find \r\n");
+//send_string_2(uart_buffer.buffer);
+
+			//check if we get caret return & end line symbols
+			if( UART4->DR == '\n' && uart_buffer.buffer[uart_buffer.current_pos-1] == '\r') {
+				uart_buffer.buffer[uart_buffer.current_pos-1] = '\0';
+				//zero last char , also decrease current position counter
+				uart_buffer.buffer[uart_buffer.current_pos--] = '\0';
+				//set buffer ready to true,we received end line , so we can send data now
+//send_string_2("found \r\n");
+//send_string_2(uart_buffer.buffer);
+
+				uart_buffer.ready = 1;
 			} else {
 				uart_buffer.buffer[uart_buffer.current_pos++] = UART4->DR;
+				//set ready to false, we still waiting for more data
 				uart_buffer.ready = 0;
 			}
 		}
 
 
 	}
+}
+
+uint8_t isReady(volatile RcvBuff* buffer){
+	//i try to make debouncer
+	if(buffer->ready==1){
+
+	//	Delayms(48);
+		//send_string_2("check if ready");
+		//i suspect that if in that time some other data we receive, buffer->ready will be set to false
+		if(buffer->ready==1){
+			send_string_2("is ready");
+			return 1;
+		}else{
+			send_string_2("is not ready");
+			return 0;
+		}
+	}
+
 }
