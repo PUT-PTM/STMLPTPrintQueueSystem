@@ -100,6 +100,7 @@ void send_string(const char* s)
 	while(*s) send_char(*s++);
 	send_char('\r');
 	send_char('\n');
+	Delayms(48);
 }
 void send_string_2(const char* s)
 {
@@ -116,32 +117,37 @@ void RcvBuffReset(volatile RcvBuff* buffer)
 	}
 	//set ready , new data can be write to it
 	buffer->ready = 1;
+	buffer->newline = 0;
 }
 
 void UART4_IRQHandler(void)
 {
+
 	if (USART_GetITStatus(UART4, USART_IT_RXNE) != RESET)
 	{
 
 		// receiving data, so we can't write to it
-		if(uart_buffer.ready == 0) {
-//send_string_2("find \r\n");
+		if(uart_buffer.ready == 1) {
+		send_char_2(UART4->DR);
+//send_string_2("find <cr><nw>");
 //send_string_2(uart_buffer.buffer);
 
 			//check if we get caret return & end line symbols
 			if( UART4->DR == '\n' && uart_buffer.buffer[uart_buffer.current_pos-1] == '\r') {
-				uart_buffer.buffer[uart_buffer.current_pos-1] = '\0';
+			//	uart_buffer.buffer[uart_buffer.current_pos-1] = '\0';
 				//zero last char , also decrease current position counter
-				uart_buffer.buffer[uart_buffer.current_pos--] = '\0';
+			//	uart_buffer.buffer[uart_buffer.current_pos--] = '\0';
 				//set buffer ready to true,we received end line , so we can send data now
-//send_string_2("found \r\n");
+//send_string_2("found  <cr><nw>");
 //send_string_2(uart_buffer.buffer);
 
-				uart_buffer.ready = 1;
-			} else {
+				//uart_buffer.ready = 0;
+				uart_buffer.newline = 1;
+			}else {
 				uart_buffer.buffer[uart_buffer.current_pos++] = UART4->DR;
 				//set ready to false, we still waiting for more data
-				uart_buffer.ready = 0;
+				//uart_buffer.ready = 1;
+				uart_buffer.newline =0;
 			}
 		}
 
@@ -149,18 +155,18 @@ void UART4_IRQHandler(void)
 	}
 }
 
-uint8_t isReady(volatile RcvBuff* buffer){
+uint8_t ReceivedNewLine(){
 	//i try to make debouncer
-	if(buffer->ready==1){
+	if(uart_buffer.newline==1){
 
-	//	Delayms(48);
-		//send_string_2("check if ready");
+		Delayms(48);
+		//send_string_2("check if new line received");
 		//i suspect that if in that time some other data we receive, buffer->ready will be set to false
-		if(buffer->ready==1){
-			send_string_2("is ready");
+		if(uart_buffer.newline==1){
+		//	send_string_2("got new line");
 			return 1;
 		}else{
-			send_string_2("is not ready");
+		//	send_string_2("no new line");
 			return 0;
 		}
 	}

@@ -6,9 +6,11 @@
 #include "tm_stm32f4_delay/tm_stm32f4_delay.h"
 extern volatile RcvBuff uart_buffer;
 
-char *error;
-int error_counter=0;
-int unexpected_error_counter=0;
+volatile char *error;
+volatile int error_counter=0;
+volatile int unexpected_error_counter=0;
+volatile uint8_t connected = 0;
+
 int main(void)
 {
 	SystemInit();
@@ -20,31 +22,72 @@ int main(void)
 //	lpt_setup();
 	//lpt_loop();
 
-	uint8_t ok = 0;
-	while(!ok){
-	for(int i=0;i<3;i++){
-		if(establish_connection()) {
-			ok = 1;
+
+	//while(!connected){
+
+		if(establish_connection() == 1 && connected == 0){
+			connected = 1;
 			set_green_led_on();
+		//	send_string_2("Connected");
+
 
 
 			//byte *msg = &uart_buffer.buffer;
 //			resetPrinter();
 //			printMessage(uart_buffer.buffer);
 //			resetPrinter();
-		} else {
+		}else if(!connected) {
 			set_red_led_on();
-			//set_green_led_on();
+			set_green_led_on();
+		//	send_string_2("Can't establish connection");
 			//byte *msg = &uart_buffer.buffer;
 	//		resetPrinter();
 	//		printMessage(uart_buffer.buffer);
 	//		resetPrinter();
 		}//end if(establish_connection)
+		//Delayms(500);
+	//}//end for( 3 times test connection)
 
-	}//end for( 3 times test connection)
-	//Delayms(50000);
+	if(connected == 1){
+	RcvBuffReset(&uart_buffer);
+	//send_string_2("if connected , send new request");
+	send_string("AT+CIPSTART=\"TCP\",\"192.168.0.110\",80");
+	Delay(98);
+	//send_string_2(uart_buffer.buffer);
+	if(ReceivedNewLine()){
+		RcvBuffReset(&uart_buffer);
 
-	}//end_while(!ok)
+			//char re_len[6] ;
+			//itoa(strlen(http_request), re_len, 10);
+			char  cipsend[400] = "AT+CIPSEND=69";
+			//strcat( cipsend, re_len);
+			//send_string_2("cisend");
+			send_string(cipsend);
+
+			Delayms(120);
+	}
+	if(ReceivedNewLine()){
+		while(!strstr(uart_buffer.buffer,">")){}
+		RcvBuffReset(&uart_buffer);
+		//send_string_2("juz nie czekam na  >");
+		Delayms(120);
+			send_string_2("http request");
+			char * http_request = "GET http://192.168.0.110:8000/api/camount / HTTP/1.0 HOST: 192.168.0.110 Accept: */*";
+		send_string(http_request);
+				Delayms(120);
+
+				//send_string_2(uart_buffer.buffer);
+		}
+
+
+	Delayms(50000);
+				send_string("AT+CIPCLOSE");
+				//send_string_2(uart_buffer.buffer);
+				RcvBuffReset(&uart_buffer);
+
+	}
+
+	//}//end_while(!ok)
 
 //	while(ok)
 //	{
