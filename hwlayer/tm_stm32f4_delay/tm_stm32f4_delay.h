@@ -237,7 +237,7 @@ extern __IO uint32_t mult;
  * @retval None
  * @note   Declared as static inline
  */
-static __INLINE void Delay(uint32_t micros) {
+static __INLINE void Delay(uint32_t micros){
 #if defined(TM_DELAY_TIM)
 	volatile uint32_t timer = TM_DELAY_TIM->CNT;
 

@@ -15,7 +15,7 @@ uint8_t establish_connection()
 //	send_string_2("establish_connection");
 	send_string("AT+CWJAP?");
 	set_blue_led_on();
-	Delay(5000);
+	//Delay(5000);
 	if(ReceivedNewLine()){
 
 //		send_string_2("<log>:");
@@ -42,7 +42,7 @@ uint8_t establish_connection()
 //				send_string_2( strcat("<log>Error:",error_counter++) );
 //				send_string_2(uart_buffer.buffer);
 //				send_string_2("</log>");
-				Delay(500);
+		//		Delay(500);
 				return 0;
 			}
 			else{
@@ -53,7 +53,7 @@ uint8_t establish_connection()
 //				send_string_2(strcat( "<log>Unexpected Error:", unexpected_error_counter++));
 //				send_string_2(uart_buffer.buffer);
 //				send_string_2("</log>");
-				Delay(5000);
+		//		Delay(5000);
 				return 0;
 
 			}
