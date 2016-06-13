@@ -1,7 +1,7 @@
 #include <stdint.h>
 
 typedef struct {
-	uint8_t current_pos;
+	int current_pos;
 	char buffer[555];
 	//is ready to receive data, 0 false, 1 true
 	uint8_t ready;

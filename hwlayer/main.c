@@ -104,36 +104,43 @@ for(;;){
 			send_string_2(temp);
 			RcvBuffReset(&uart_buffer);
 			if(uart_buffer.ready == 1){
-				send_string("AT+CIPSEND=76");
+				send_string("AT+CIPSEND=71");
 				uart_flag = declare_http_request;
 				set_blue_led_on();
 			}
 		}
 		break;
 		case declare_http_request:
-			if(strstr(uart_buffer.buffer, "> ")){
+			if(strstr(uart_buffer.buffer, ">")){
 				set_blue_led_off();
-				send_string_2(uart_buffer.buffer);
-				send_string("GET http://192.168.0.105/index.html HTTP/1.0 HOST: 192.168.0.105 Accept: */*");
+				//send_string_2(uart_buffer.buffer);
+				send_string("GET / HTTP/1.0 Host: 192.168.0.105 Connection: keep-alive Accept: */*\n\n");
 				uart_flag = send_http_request;
 				RcvBuffReset(&uart_buffer);
 			}
 		break;
 		case send_http_request:{
-			if(strstr(uart_buffer.buffer, "SEND OK")){
-				set_blue_led_on();
-				char temp[255];
-							//strcpy(temp,"<http>\n");
-							strcat(temp, uart_buffer.buffer);
-							//strcat(temp,"</http>");
-							send_string_2(temp);
-							uart_flag = receive_http_data;
+				//	send_string_2(uart_buffer.buffer);
+					if(strstr(uart_buffer.buffer, "SEND OK")){
+						RcvBuffReset(&uart_buffer);
+								set_blue_led_on();
+		//						char temp[255];
+		//									//strcpy(temp,"<http>\n");
+		//									strcat(temp, uart_buffer.buffer);
+		//									//strcat(temp,"</http>");
+		//									send_string_2(uart_buffer.buffer);
+											uart_flag = receive_http_data;
+
+							}
+
+						}
+		break;
+		case receive_http_data:{
+			if(strstr(uart_buffer.buffer, "Content-Type: text/html")){
+				send_string_2("<http>\n");
 			}
 
 		}
-		break;
-		case receive_http_data:
-
 		break;
 		case disconnecting:
 
@@ -153,6 +160,9 @@ for(;;){
 		}
 
 	}else if(strstr(uart_buffer.buffer, "> ") && uart_flag == declare_http_request){
+		uart_buffer.newline = 1;
+	}
+	else if(strstr(uart_buffer.buffer, "+IPD")  && uart_flag == receive_http_data){
 		uart_buffer.newline = 1;
 	}
 	else{
