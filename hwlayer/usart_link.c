@@ -100,7 +100,6 @@ void send_string(const char* s)
 	while(*s) send_char(*s++);
 	send_char('\r');
 	send_char('\n');
-//	Delayms(48);
 }
 void send_string_2(const char* s)
 {
@@ -118,7 +117,7 @@ void RcvBuffReset(volatile RcvBuff* buffer)
 	//set ready , new data can be write to it
 	buffer->ready = 1;
 	//false. after reset we have no new line
-	buffer->newline = 0;
+	buffer->newline = 1;
 }
 
 void UART4_IRQHandler(void)
@@ -126,34 +125,35 @@ void UART4_IRQHandler(void)
 
 	if (USART_GetITStatus(UART4, USART_IT_RXNE) != RESET)
 	{
-	//	uart_fast_buffer.buffer[uart_fast_buffer.current_pos++] = UART4->DR;
-
-
-		uart_buffer.buffer[uart_buffer.current_pos++] = UART4->DR;
-		TM_DELAY_SetTime(0);
-
-	}
-}
-
-
-uint8_t isComandEnd(){
-	//send_char_2(uart_buffer.buffer[uart_buffer.current_pos]);
-	//jesli czekamy 120ms od ostatniego znaku z esp
-	if(TM_DELAY_Time() > 1200){
-		set_red_led_off();
-		set_green_led_off();
-		if(uart_buffer.buffer[uart_buffer.current_pos] == '\n'){
+		if(UART4->DR == '\n'){
 			uart_buffer.newline = 1;
-			set_green_led_on();
-			return 1;
-		}else {
+		}else
+		{
 			uart_buffer.newline = 0;
-			set_red_led_on();
-			set_green_led_off();
 		}
+		uart_buffer.buffer[uart_buffer.current_pos++] = UART4->DR;
 	}
-return 0;
 }
+
+
+//uint8_t isComandEnd(){
+//	//send_char_2(uart_buffer.buffer[uart_buffer.current_pos]);
+//	//jesli czekamy 120ms od ostatniego znaku z esp
+//	if(TM_DELAY_Time() > 1200){
+//		set_red_led_off();
+//		set_green_led_off();
+//		if(uart_buffer.buffer[uart_buffer.current_pos] == '\n'){
+//			uart_buffer.newline = 1;
+//			set_green_led_on();
+//			return 1;
+//		}else {
+//			uart_buffer.newline = 0;
+//			set_red_led_on();
+//			set_green_led_off();
+//		}
+//	}
+//return 0;
+//}
 
 //		// receiving data, so we can't write to it
 //		if(uart_buffer.ready == 1) {
@@ -184,20 +184,4 @@ return 0;
 
 
 
-uint8_t ReceivedNewLine(){
-	//i try to make debouncer
-	if(uart_buffer.newline==1){
 
-	//	Delayms(48);
-		//send_string_2("check if new line received");
-		//i suspect that if in that time some other data we receive, buffer->ready will be set to false
-		if(uart_buffer.newline==1){
-		//	send_string_2("got new line");
-			return 1;
-		}else{
-		//	send_string_2("no new line");
-			return 0;
-		}
-	}
-
-}

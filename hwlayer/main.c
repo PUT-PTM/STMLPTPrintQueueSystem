@@ -4,14 +4,24 @@
 #include "led_indicators.h"
 #include "lpt_driver.h"
 #include "tm_stm32f4_delay/tm_stm32f4_delay.h"
-#include "mytimer.h"
-extern volatile RcvBuff uart_buffer;
 
-volatile char *error;
-volatile int error_counter=0;
-volatile int unexpected_error_counter=0;
-volatile uint8_t connected = 0;
-void TIM3_IRQHandler(void);
+extern volatile RcvBuff uart_buffer;
+volatile enum Flag{
+	start,//just started
+	connecting,//waiting for answer is esp connected to wifi network
+	connected,//esp is connected to wifi network
+	linking,//waiting for answer is esp connected to server
+	linked,//esp is linked to http server
+	declare_http_request,//declaration of new reqest was send, waitng for ">" char
+	send_http_request,//
+	receive_http_data,//
+	disconnecting,//
+	disconected//
+};
+
+//TM_DELAY_Timer_t* timer = TM_DELAY_TimerCreate(20,1,1);
+//TM_Delay_Timer_Start(timer);
+
 int main(void)
 {
 	SystemInit();
@@ -21,39 +31,126 @@ int main(void)
 	discovery_led_configure();
 	send_string_2("--start--");
 //	lpt_setup();
-	//lpt_loop();
-for(int i=0;i<5;i++)
-	if(!connected){
-		send_string("AT+CWJAP?");
-		set_orange_led_on();
-		while(uart_buffer.newline == 0){set_blue_led_on();}
-			if(strstr(uart_buffer.buffer, "OK")) {
-						set_green_led_on();
-						set_blue_led_off();
-						set_orange_led_off();
-						set_red_led_off();
-						send_string_2("<log>OK:");
-						send_string_2(uart_buffer.buffer);
-						send_string_2("</log>");
+//	lpt_loop();
 
-						RcvBuffReset(&uart_buffer);
-						connected = 1;
-			}else{
-				connected = 0;
+enum Flag uart_flag = start;
+for(;;){
+
+
+	//check if new line is on end
+	if(uart_buffer.newline == 1){
+		switch(uart_flag){
+		case start:{
+			RcvBuffReset(&uart_buffer);
+			if(uart_buffer.ready == 1){
+			send_string("AT+CWJAP?");
+			uart_flag = connecting;
 			}
+		}
+		break;
+		case connecting:{
+			if(strstr(uart_buffer.buffer, "OK")){
+				uart_flag = connected;
+				char temp[255];
+				strcpy(temp,"<log>OK: ");
+				strcat(temp, uart_buffer.buffer);
+				strcat(temp,"</log>");
+				send_string_2(temp);
+				RcvBuffReset(&uart_buffer);
+			}
+		}
+		break;
+		case connected:{
+			if(uart_buffer.ready == 1){
+				send_string("AT+CIPSTART=\"TCP\",\"192.168.0.105\",80");
+				uart_flag = linking;
+				char temp[255];
+				strcpy(temp,"...Linking");
+				send_string_2(temp);
+			}
+		}
+		break;
+		case linking:{
+			if(strstr(uart_buffer.buffer, "ALREAY CONNECT") || strstr(uart_buffer.buffer, "OK\r\nLinked") ){
+			uart_flag = linked;
+			set_green_led_on();
+			char temp[255];
+			strcpy(temp,"<log>Linked: ");
+			strcat(temp, uart_buffer.buffer);
+			strcat(temp,"</log>");
+			send_string_2(temp);
+			RcvBuffReset(&uart_buffer);
+			}else{
+				set_green_led_off();
+				set_red_led_on();
+			}
+		}
+		break;
+		case linked:{
+			char temp[255];
+			strcpy(temp,"<log>Declare http request: ");
+			strcat(temp, uart_buffer.buffer);
+			strcat(temp,"</log>");
+			send_string_2(temp);
+			RcvBuffReset(&uart_buffer);
+			if(uart_buffer.ready == 1){
+				send_string("AT+CIPSEND=69");
+				uart_flag = declare_http_request;
+				set_blue_led_on();
+			}
+		}
+		break;
+		case declare_http_request:
+			if(strstr(uart_buffer.buffer, "> ")){
+				set_blue_led_off();
+				send_string_2(uart_buffer.buffer);
+				RcvBuffReset(&uart_buffer);
+				if(uart_buffer.ready == 1){
+					send_string("GET / HTTP/1.0 HOST: 192.168.0.105 Connection: keep-alive Accept: */*");
+					uart_flag = send_http_request;
+				}
+			}
+		break;
+		case send_http_request:{
+				set_blue_led_on();
+				char temp[255];
+							//strcpy(temp,"<http>\n");
+							strcat(temp, uart_buffer.buffer);
+							//strcat(temp,"</http>");
+							send_string_2(temp);
+		}
+		break;
+		case receive_http_data:
 
+		break;
+		case disconnecting:
 
+		break;
+		case disconected:
+
+		break;
+		default:
+			send_string_2("<log>default switch</log>");
+			char temp[255];
+										//strcpy(temp,"<http>\n");
+										strcat(temp, uart_buffer.buffer);
+										//strcat(temp,"</http>");
+										send_string_2(temp);
+			Delayms(500);
+		break;
+		}
+
+	}else if(strstr(uart_buffer.buffer, "> ") && uart_flag == declare_http_request){
+		uart_buffer.newline = 1;
+	}
+	else{
+
+		//wait 200ms
+		Delayms(20);
+		//send_string_2("--delay--");
 	}
 }
-void TIM3_IRQHandler(void)
-{
-             if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)
-             {
- // miejsce na kod wywo³ywany w momencie wyst¹pienia przerwania
-            	 isComandEnd();
-					 // wyzerowanie flagi wyzwolonego przerwania
-			 TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
-			  }
+
 }
 
 	//while(!connected){
