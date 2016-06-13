@@ -18,7 +18,7 @@ volatile enum Flag{
 	disconnecting,//
 	disconected//
 };
-
+volatile uint8_t link_error = 0;
 //TM_DELAY_Timer_t* timer = TM_DELAY_TimerCreate(20,1,1);
 //TM_Delay_Timer_Start(timer);
 
@@ -80,7 +80,17 @@ for(;;){
 			strcat(temp,"</log>");
 			send_string_2(temp);
 			RcvBuffReset(&uart_buffer);
-			}else{
+			}else if(link_error > 3){
+				char temp[255];
+				strcpy(temp,"<log>Not Linked, restart: ");
+				strcat(temp, uart_buffer.buffer);
+				strcat(temp,"</log>");
+				send_string_2(temp);
+				RcvBuffReset(&uart_buffer);
+				uart_flag = start;
+			}
+			else{
+				link_error++;
 				set_green_led_off();
 				set_red_led_on();
 			}
@@ -94,7 +104,7 @@ for(;;){
 			send_string_2(temp);
 			RcvBuffReset(&uart_buffer);
 			if(uart_buffer.ready == 1){
-				send_string("AT+CIPSEND=69");
+				send_string("AT+CIPSEND=76");
 				uart_flag = declare_http_request;
 				set_blue_led_on();
 			}
@@ -104,20 +114,22 @@ for(;;){
 			if(strstr(uart_buffer.buffer, "> ")){
 				set_blue_led_off();
 				send_string_2(uart_buffer.buffer);
+				send_string("GET http://192.168.0.105/index.html HTTP/1.0 HOST: 192.168.0.105 Accept: */*");
+				uart_flag = send_http_request;
 				RcvBuffReset(&uart_buffer);
-				if(uart_buffer.ready == 1){
-					send_string("GET / HTTP/1.0 HOST: 192.168.0.105 Connection: keep-alive Accept: */*");
-					uart_flag = send_http_request;
-				}
 			}
 		break;
 		case send_http_request:{
+			if(strstr(uart_buffer.buffer, "SEND OK")){
 				set_blue_led_on();
 				char temp[255];
 							//strcpy(temp,"<http>\n");
 							strcat(temp, uart_buffer.buffer);
 							//strcat(temp,"</http>");
 							send_string_2(temp);
+							uart_flag = receive_http_data;
+			}
+
 		}
 		break;
 		case receive_http_data:
