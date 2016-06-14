@@ -57,12 +57,12 @@ void lpt_configure(){
 		lpt_data_lines.GPIO_Speed = GPIO_Speed_50MHz;
 		GPIO_Init(GPIOA, &lpt_data_lines);
 
-//ack input
+//button 1 button 2, ack input,
 		GPIO_InitTypeDef lpt_ack_pin;
 				lpt_states_lines.GPIO_OType = GPIO_OType_PP;
 				lpt_states_lines.GPIO_PuPd = GPIO_PuPd_UP;
 				lpt_states_lines.GPIO_Mode = GPIO_Mode_IN;
-				lpt_states_lines.GPIO_Pin = GPIO_Pin_8;
+				lpt_states_lines.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
 				lpt_states_lines.GPIO_Speed = GPIO_Speed_50MHz;
 				GPIO_Init(GPIOB, &lpt_ack_pin);
 //busy pin
