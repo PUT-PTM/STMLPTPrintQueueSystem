@@ -21,7 +21,8 @@ volatile enum Flag{
 int sizeof_http_request(char *buffer);
 int sizeof_http_content(char *buffer);
 char* get_http_content(char *buffer);
-char* get_queue_number(char *content);
+//char* get_queue_number(char *content);
+void get_queue_number(char *number, char *content);
 void prepare_ticket(char  *message, char * number);
 //volatile char *ticket_message;
 //volatile char queue_number[8]="";
@@ -148,12 +149,12 @@ for(;;){
 				strcpy(temp, uart_buffer.buffer);
 				char *content = get_http_content(temp);
 				send_string_2(content);
-				char queue_number[8];
-				strcpy(queue_number,get_queue_number(content));
-				char *ticket ;
-				prepare_ticket( ticket, &queue_number );
-				send_string_2("print ticket\n");
+				char queue_number[8]; char ticket[160];
+				get_queue_number(&queue_number,content);
+				prepare_ticket( &ticket, &queue_number );
+				send_string_2("<print ticket>");
 				send_string_2(ticket);
+				send_string_2("</print ticket>");
 				printMessage(stringToByte(ticket));
 				uart_flag = disconnecting;
 				set_orange_led_on();
@@ -212,16 +213,16 @@ char* get_http_content(char *buffer){
 
  	return content_ptr;
 }
-char* get_queue_number(char *content){
+void get_queue_number(char * number,char *content){
 	char * content_ptr = strstr(content, "number:\"")+8;
-	char queue_number[8];
-	strncpy(queue_number,content_ptr,8);
-	queue_number[7]='\0';
-	return (&queue_number);
+//	char queue_number[8];
+	strncpy(number,content_ptr,8);
+	number[7]='\0';
+//	return (queue_number);
 }
 void prepare_ticket(char  *message, char * number){
-	strcpy(message,"\r\n Bilet STMLPTPQS\r\n Twoj\tNumer\r\n\r\n\t");
-	strcpy(message,number);
+	strcpy(message,"\r\n Bilet STMLPTPQS\r\n Twoj\tNumer\r\n\r\n ");
+	strcat(message,number);
 	strcat(message,"\r\nTu powinna byc godzina\r\n");
 
 }
