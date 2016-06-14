@@ -15,8 +15,8 @@
 //}
 
 byte startup_message[startup_num_lines][startup_charsPerLine] = {
-  "w",
-  "s"
+  "start",
+  "OK"
 };
 
 
@@ -24,20 +24,38 @@ byte std_message[num_lines][charsPerLine] = {
  "oj ktos zapomnial co chce drukowac"
 };
 
-byte *stringToByte(char *msg){
+void stringToByte(byte *inbyte, char *msg ){
 	int msg_len = strlen(msg);
-
-	byte inbyte[80][msg_len];
-	for(int r=0,cur_pos = 0;r<(msg_len/40),cur_pos<msg_len;r++){
-			for(int i=r*80; i< (r*80)+79, cur_pos<msg_len;i++,cur_pos++){//dlugosc wiadomosci / 80 )*2 bo po znaku na \n
-
-				inbyte[r][i]=msg[i];
-				if(msg[i] == '\n')
-					r++;
+	int pos=0;
+	//iteruje po wierszach, ustawiona na sztywno maksymalna ilosc (10) wierszy
+	for(int r=0; r< num_lines; r++){
+		//iteruje przez kolumny, maks 80 znakow na wiersz
+		for(int c=0;c<80,pos<msg_len;c++){
+			//jesli obecna pozycja nie jest znakiem nowej lini
+			if(msg[pos] != '\n'){
+			(&inbyte)[r][c] = msg[pos++];
+			}else{
+				(&inbyte)[r][c] = '\0';
 			}
+		}
+
 
 	}
-	return inbyte;
+
+
+	//byte inbyte[80][msg_len];
+//	for(int r=0,cur_pos = 0;r<(msg_len/40),cur_pos<msg_len;r++){
+//			for(int i=r*80; i< (r*80)+79, cur_pos<msg_len;i++,cur_pos++){//dlugosc wiadomosci / 80 )*2 bo po znaku na \n
+//
+//				(&inbyte)[r][i]=msg[i];
+//				if(msg[i] == '\n'){
+//					r++;
+//				}
+//			}
+//
+//	}
+
+	//return inbyte;
 }
 void lpt_configure(){
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);

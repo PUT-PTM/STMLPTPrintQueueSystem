@@ -25,4 +25,4 @@ void printByte(byte inByte);
 void resetPrinter();
 void printMessage(byte *message);
 void printStartupMessage();
-byte *stringToByte(char *msg);
+void stringToByte(byte* inbyte,char *msg);

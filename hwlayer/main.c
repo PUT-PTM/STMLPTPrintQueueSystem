@@ -71,7 +71,7 @@ for(;;){
 		break;
 		case connected:{
 			if(uart_buffer.ready == 1){
-				send_string("AT+CIPSTART=\"TCP\",\"192.168.0.105\",80");
+				send_string("AT+CIPSTART=\"TCP\",\"192.168.0.105\",8000");
 				uart_flag = linking;
 				char temp[255];
 				strcpy(temp,"...Linking");
@@ -114,7 +114,7 @@ for(;;){
 			send_string_2(temp);
 			RcvBuffReset(&uart_buffer);
 			if(uart_buffer.ready == 1){
-				send_string("AT+CIPSEND=106");
+				send_string("AT+CIPSEND=105");
 				uart_flag = declare_http_request;
 				set_blue_led_on();
 			}
@@ -155,7 +155,11 @@ for(;;){
 				send_string_2("<print ticket>");
 				send_string_2(ticket);
 				send_string_2("</print ticket>");
-				printMessage(stringToByte(ticket));
+				//printing ticket !
+				byte msgtoprint[4][80]= {};
+				//stringToByte(&msgtoprint,&ticket);
+				printMessage(ticket);
+				//printMessage(&msgtoprint);
 				uart_flag = disconnecting;
 				set_orange_led_on();
 			}
@@ -221,10 +225,8 @@ char* get_http_content(char *buffer){
 }
 void get_queue_number(char * number,char *content){
 	char * content_ptr = strstr(content, "number:\"")+8;
-//	char queue_number[8];
 	strncpy(number,content_ptr,8);
 	number[7]='\0';
-//	return (queue_number);
 }
 void prepare_ticket(char  *message, char * number){
 	strcpy(message,"\r\n Bilet STMLPTPQS\r\n Twoj\tNumer\r\n\r\n ");
