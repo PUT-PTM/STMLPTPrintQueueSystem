@@ -114,7 +114,7 @@ for(;;){
 			send_string_2(temp);
 			RcvBuffReset(&uart_buffer);
 			if(uart_buffer.ready == 1){
-				send_string("AT+CIPSEND=105");
+				send_string("AT+CIPSEND=110");
 				uart_flag = declare_http_request;
 				set_blue_led_on();
 			}
@@ -124,7 +124,7 @@ for(;;){
 			if(strstr(uart_buffer.buffer, ">")){
 				set_blue_led_off();
 				send_string_2(uart_buffer.buffer);
-				char request[108] = "GET http://192.168.0.105/api/number/";
+				char request[108] = "GET http://192.168.0.105:8000/api/number/";
 				strcat(request, category);//depend on wich button wos pressed last
 				strcat(request, "/ HTTP/1.0 Host: 192.168.0.105 Connection: keep-alive Accept: */*\n\n");
 				//send_string("GET http://192.168.0.105/api/number/01 HTTP/1.0 Host: 192.168.0.105 Connection: keep-alive Accept: */*\n\n");
@@ -147,8 +147,11 @@ for(;;){
 
 				char temp[555];
 				strcpy(temp, uart_buffer.buffer);
+				send_string_2("CHECKPOINT");
 				char *content = get_http_content(temp);
 				send_string_2(content);
+				send_string_2("CHECKPOINT2");
+				send_string_2(temp);
 				char queue_number[8]; char ticket[160];
 				get_queue_number(&queue_number,content);
 				prepare_ticket( &ticket, &queue_number );
@@ -215,7 +218,7 @@ int sizeof_http_content(char *buffer) {
 	return atoi(lenght);
 }
 char* get_http_content(char *buffer){
-	char * content_ptr = strstr(buffer, "Content-Type: text/html") + strlen("Content-Type: text/html")+3;
+	char * content_ptr = strstr(buffer, "Content-Type: application/json") + strlen("Content-Type: application/json")+3;
  //	size_t content_size = sizeof_http_content(buffer);
 // 	char * content;// content = (char*)malloc( content_size );
 // 	strncpy(content, content_ptr, content_size+3);
