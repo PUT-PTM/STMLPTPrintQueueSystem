@@ -30,7 +30,7 @@ QRY
     }
 
     /**
-     * @Route("/api/number/{catId}")
+     * @Route("/api/number/{catId}/")
      * @Method({"GET"})
      */
     public function getNextNumberAction($catId) {
