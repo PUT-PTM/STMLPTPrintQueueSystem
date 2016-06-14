@@ -22,7 +22,9 @@ int sizeof_http_request(char *buffer);
 int sizeof_http_content(char *buffer);
 char* get_http_content(char *buffer);
 char* get_queue_number(char *content);
-char *prepare_ticket(char *queue_number);
+void prepare_ticket(char  *message, char * number);
+//volatile char *ticket_message;
+//volatile char queue_number[8]="";
 volatile uint8_t link_error = 0;
 //TM_DELAY_Timer_t* timer = TM_DELAY_TimerCreate(20,1,1);
 //TM_Delay_Timer_Start(timer);
@@ -146,7 +148,10 @@ for(;;){
 				strcpy(temp, uart_buffer.buffer);
 				char *content = get_http_content(temp);
 				send_string_2(content);
-				char *ticket = prepare_ticket( get_queue_number(content));
+				char queue_number[8];
+				strcpy(queue_number,get_queue_number(content));
+				char *ticket ;
+				prepare_ticket( ticket, &queue_number );
 				send_string_2("print ticket\n");
 				send_string_2(ticket);
 				printMessage(stringToByte(ticket));
@@ -209,15 +214,15 @@ char* get_http_content(char *buffer){
 }
 char* get_queue_number(char *content){
 	char * content_ptr = strstr(content, "number:\"")+8;
-	char queue_number[8]=""; strncpy(queue_number,content_ptr,8);
+	char queue_number[8];
+	strncpy(queue_number,content_ptr,8);
 	queue_number[7]='\0';
 	return (&queue_number);
 }
-char *prepare_ticket(char * queue_number){
-	char *ticket_message;
-	strcpy(ticket_message,"\r\n Bilet STMLPTPQS\r\n Twoj\tNumer\r\n\r\n\t");
-	strcat(ticket_message,queue_number);
-	strcat(ticket_message,"\r\nTu powinna byc godzina\r\n");
-	return ticket_message;
+void prepare_ticket(char  *message, char * number){
+	strcpy(message,"\r\n Bilet STMLPTPQS\r\n Twoj\tNumer\r\n\r\n\t");
+	strcpy(message,number);
+	strcat(message,"\r\nTu powinna byc godzina\r\n");
+
 }
 
