@@ -42,7 +42,7 @@ int main(void)
 //	lpt_loop();
 
 enum Flag uart_flag = start;
-strcpy(category , "01");
+strcpy(category , "1");
 for(;;){
 
 
@@ -188,6 +188,12 @@ for(;;){
 		//wait 200ms
 		Delayms(20);
 
+	}
+
+	if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_6) == 1) {
+		strcpy(category, "1");
+	} else if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_7) == 1) {
+		strcpy(category, "2");
 	}
 }
 
