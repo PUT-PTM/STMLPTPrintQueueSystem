@@ -18,10 +18,15 @@ volatile enum Flag{
 	disconnecting,//
 	disconected//
 };
+int sizeof_http_request(char *buffer);
+int sizeof_http_content(char *buffer);
+char* get_http_content(char *buffer);
+char* get_queue_number(char *content);
+char *prepare_ticket(char queue_number[8]);
 volatile uint8_t link_error = 0;
 //TM_DELAY_Timer_t* timer = TM_DELAY_TimerCreate(20,1,1);
 //TM_Delay_Timer_Start(timer);
-
+volatile char category[2];
 int main(void)
 {
 	SystemInit();
@@ -34,6 +39,7 @@ int main(void)
 //	lpt_loop();
 
 enum Flag uart_flag = start;
+strcpy(category , "01");
 for(;;){
 
 
@@ -87,6 +93,7 @@ for(;;){
 				strcat(temp,"</log>");
 				send_string_2(temp);
 				RcvBuffReset(&uart_buffer);
+				//rest
 				uart_flag = start;
 			}
 			else{
@@ -104,7 +111,7 @@ for(;;){
 			send_string_2(temp);
 			RcvBuffReset(&uart_buffer);
 			if(uart_buffer.ready == 1){
-				send_string("AT+CIPSEND=71");
+				send_string("AT+CIPSEND=106");
 				uart_flag = declare_http_request;
 				set_blue_led_on();
 			}
@@ -113,182 +120,108 @@ for(;;){
 		case declare_http_request:
 			if(strstr(uart_buffer.buffer, ">")){
 				set_blue_led_off();
-				//send_string_2(uart_buffer.buffer);
-				send_string("GET / HTTP/1.0 Host: 192.168.0.105 Connection: keep-alive Accept: */*\n\n");
+				send_string_2(uart_buffer.buffer);
+				char request[108] = "GET http://192.168.0.105/api/number/";
+				strcat(request, category);
+				strcat(request, "/ HTTP/1.0 Host: 192.168.0.105 Connection: keep-alive Accept: */*\n\n");
+				//send_string("GET http://192.168.0.105/api/number/01 HTTP/1.0 Host: 192.168.0.105 Connection: keep-alive Accept: */*\n\n");
+				send_string(request);
+				//send_string_2(request);
 				uart_flag = send_http_request;
 				RcvBuffReset(&uart_buffer);
 			}
 		break;
 		case send_http_request:{
-				//	send_string_2(uart_buffer.buffer);
-					if(strstr(uart_buffer.buffer, "SEND OK")){
-						RcvBuffReset(&uart_buffer);
-								set_blue_led_on();
-		//						char temp[255];
-		//									//strcpy(temp,"<http>\n");
-		//									strcat(temp, uart_buffer.buffer);
-		//									//strcat(temp,"</http>");
-		//									send_string_2(uart_buffer.buffer);
-											uart_flag = receive_http_data;
-
-							}
-
-						}
+			if(strstr(uart_buffer.buffer, "SEND OK")){
+				set_blue_led_on();
+				uart_flag = receive_http_data;
+			}
+		}
 		break;
 		case receive_http_data:{
-			if(strstr(uart_buffer.buffer, "Content-Type: text/html")){
-				send_string_2("<http>\n");
+			//here we receive data from server
+			//get position of +IPD,
+
+			//char * ptr = strstr(uart_buffer.buffer, "Content-Type: text/html");
+//check if get all data
+			if( (sizeof_http_request(uart_buffer.buffer)+16) <= uart_buffer.current_pos ){
+
+				char temp[555];
+				strcpy(temp, uart_buffer.buffer);
+				char *content = get_http_content(temp);
+				send_string_2(content);
+				char *ticket = prepare_ticket( get_queue_number(content));
+				send_string_2("print ticket\n");
+				send_string_2(ticket);
+
+				uart_flag = disconnecting;
+				set_orange_led_on();
 			}
 
 		}
 		break;
-		case disconnecting:
+		case disconnecting:{
+			set_blue_led_off();
+		}
 
 		break;
 		case disconected:
 
 		break;
-		default:
-			send_string_2("<log>default switch</log>");
+		default:{
 			char temp[255];
-										//strcpy(temp,"<http>\n");
-										strcat(temp, uart_buffer.buffer);
-										//strcat(temp,"</http>");
-										send_string_2(temp);
+			strcpy(temp,"<log>default switch");
+			strcat(temp, uart_buffer.buffer);
+			strcat(temp,"</log>");
+			send_string_2(temp);
 			Delayms(500);
+		}
 		break;
 		}
-
+	//if last char is not a \n
 	}else if(strstr(uart_buffer.buffer, "> ") && uart_flag == declare_http_request){
 		uart_buffer.newline = 1;
 	}
-	else if(strstr(uart_buffer.buffer, "+IPD")  && uart_flag == receive_http_data){
-		uart_buffer.newline = 1;
-	}
 	else{
-
 		//wait 200ms
 		Delayms(20);
-		//send_string_2("--delay--");
+
 	}
 }
 
 }
 
-	//while(!connected){
-//
-//		if(establish_connection() == 1 && connected == 0){
-//			connected = 1;
-//			set_green_led_on();
-//		//	send_string_2("Connected");
-//
-//
-//
-//			//byte *msg = &uart_buffer.buffer;
-////			resetPrinter();
-////			printMessage(uart_buffer.buffer);
-////			resetPrinter();
-//		}else if(!connected) {
-//			set_red_led_on();
-//			set_green_led_on();
-//		//	send_string_2("Can't establish connection");
-//			//byte *msg = &uart_buffer.buffer;
-//	//		resetPrinter();
-//	//		printMessage(uart_buffer.buffer);
-//	//		resetPrinter();
-//		}//end if(establish_connection)
-//		//Delayms(500);
-//	//}//end for( 3 times test connection)
-//
-//	if(connected == 1){
-//	RcvBuffReset(&uart_buffer);
-//	//send_string_2("if connected , send new request");
-//	send_string("AT+CIPSTART=\"TCP\",\"192.168.0.110\",8000");
-//	//Delay(98);
-//	//send_string_2(uart_buffer.buffer);
-//	if(ReceivedNewLine()){
-//		RcvBuffReset(&uart_buffer);
-//
-//			//char re_len[6] ;
-//			//itoa(strlen(http_request), re_len, 10);
-//			char  cipsend[400] = "AT+CIPSEND=69";
-//			//strcat( cipsend, re_len);
-//			//send_string_2("cisend");
-//			send_string(cipsend);
-//
-//			//Delayms(120);
-//	}
-//	if(ReceivedNewLine()){
-//		while(!strstr(uart_buffer.buffer,">")){}
-//		RcvBuffReset(&uart_buffer);
-//		//send_string_2("juz nie czekam na  >");
-//	//	Delayms(120);
-//			send_string_2("http request");
-//			char * http_request = "GET http://192.168.0.110:8000/api/camount HTTP/1.0 HOST: 192.168.0.110 Accept: */*";
-//		send_string(http_request);
-//				//Delayms(120);
-//
-//				//send_string_2(uart_buffer.buffer);
-//		}
-//
-//
-//	Delayms(50000);
-//				send_string("AT+CIPCLOSE");
-//				//send_string_2(uart_buffer.buffer);
-//				RcvBuffReset(&uart_buffer);
-//
-//	}
+int sizeof_http_request(char *buffer) {
+	char * content_lenght = strstr(buffer, "+IPD,") + strlen("+IPD,")-1;
+	char lenght[3] = ""; strncpy(lenght, content_lenght, 3);
+	return atoi(lenght);
+}
 
-	//}//end_while(!ok)
+int sizeof_http_content(char *buffer) {
+	char * content_lenght = strstr(buffer, "Content-Length: ") + strlen("Content-Length: ")-1;
+	char lenght[3] = ""; strncpy(lenght, content_lenght, 3);
+	return atoi(lenght);
+}
+char* get_http_content(char *buffer){
+	char * content_ptr = strstr(buffer, "Content-Type: text/html") + strlen("Content-Type: text/html")+3;
+ //	size_t content_size = sizeof_http_content(buffer);
+// 	char * content;// content = (char*)malloc( content_size );
+// 	strncpy(content, content_ptr, content_size+3);
+// 	content[content_size] = '\n';
 
-//	while(ok)
-//	{
-//		set_orange_led_off();
-//		if(uart_buffer.ready == 1) {
-//			RcvBuffReset(&uart_buffer);
-//			send_string("AT+CIPSTART=?");
-//			//Delay(500);
-//			if(uart_buffer.ready == 1) {
-//			if(strstr(uart_buffer.buffer, "OK")) {
-//				RcvBuffReset(&uart_buffer);
-//				if(uart_buffer.ready == 1) {
-//		//					send_string("AT+CIPSTART?");
-//							send_string("AT+CIPSTART=\"TCP\",\"192.168.0.105\",80");
-//							RcvBuffReset(&uart_buffer);
-//							Delay(5000);
-//
-//							if(uart_buffer.ready == 1) {
-//								if(!strstr(uart_buffer.buffer, "LINKED")) {
-//														send_string("AT+CIPSEND=0,69\n> GET \/ HTTP\/1.0 HOST: 192.168.0.105 Connection: keep-alive Accept: *\/*");
-//
-//														set_orange_led_on();
-//														RcvBuffReset(&uart_buffer);
-//														Delay(5000);
-//											}
-//							}
-//
-//
-//				}
-//			}
-//			}
-//		}
-//
-////		if(uart_buffer.ready == 1) {
-////			Delay(5000);
-////			send_string("AT+CIPCLOSE");
-////			RcvBuffReset(&uart_buffer);
-////
-////		}
-//
-//		Delayms(5000);
-//		//if(uart_buffer.ready == 1) {
-//			//send_string(uart_buffer.buffer);
-////			send_string("AT+CIPSTART=0,\"TCP\",\"192.168.0.108\",80");
-////			send_string('AT+CIPSEND=0,69');
-////			send_string('GET \/ HTTP\/1.0 HOST: 192.168.0.108 Connection: keep-alive Accept: *\/*');
-////			RcvBuffReset(&uart_buffer);
-//			//Delay(50);
-////			set_orange_led_on();
-//		//}
-//	}//while
+ 	return content_ptr;
+}
+char* get_queue_number(char *content){
+	char * content_ptr = strstr(content, "number:")+8;
+	char queue_number[8]=""; strncpy(queue_number,content_ptr,7);
+	queue_number[7]='\0';
+	return queue_number;
+}
+char *prepare_ticket(char queue_number[8]){
+	char *ticket_message;
+	strcpy(ticket_message,"\r\n Bilet STMLPTPQS\r\n Twoj\tNumer\r\n\r\n\t");
+	strcat(ticket_message,queue_number);
+	strcat(ticket_message,"\r\nTu powinna byc godzina\r\n");
+	return ticket_message;
+}
 
