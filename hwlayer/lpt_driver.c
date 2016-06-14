@@ -24,7 +24,21 @@ byte std_message[num_lines][charsPerLine] = {
  "oj ktos zapomnial co chce drukowac"
 };
 
+byte *stringToByte(char *msg){
+	int msg_len = strlen(msg);
 
+	byte inbyte[80][msg_len];
+	for(int r=0,cur_pos = 0;r<(msg_len/40),cur_pos<msg_len;r++){
+			for(int i=r*80; i< (r*80)+79, cur_pos<msg_len;i++,cur_pos++){//dlugosc wiadomosci / 80 )*2 bo po znaku na \n
+
+				inbyte[r][i]=msg[i];
+				if(msg[i] == '\n')
+					r++;
+			}
+
+	}
+	return inbyte;
+}
 void lpt_configure(){
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);

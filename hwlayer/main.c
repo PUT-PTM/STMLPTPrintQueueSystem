@@ -22,7 +22,7 @@ int sizeof_http_request(char *buffer);
 int sizeof_http_content(char *buffer);
 char* get_http_content(char *buffer);
 char* get_queue_number(char *content);
-char *prepare_ticket(char queue_number[8]);
+char *prepare_ticket(char *queue_number);
 volatile uint8_t link_error = 0;
 //TM_DELAY_Timer_t* timer = TM_DELAY_TimerCreate(20,1,1);
 //TM_Delay_Timer_Start(timer);
@@ -35,7 +35,7 @@ int main(void)
 	usart2_configure();
 	discovery_led_configure();
 	send_string_2("--start--");
-//	lpt_setup();
+	lpt_setup();
 //	lpt_loop();
 
 enum Flag uart_flag = start;
@@ -122,7 +122,7 @@ for(;;){
 				set_blue_led_off();
 				send_string_2(uart_buffer.buffer);
 				char request[108] = "GET http://192.168.0.105/api/number/";
-				strcat(request, category);
+				strcat(request, category);//depend on wich button wos pressed last
 				strcat(request, "/ HTTP/1.0 Host: 192.168.0.105 Connection: keep-alive Accept: */*\n\n");
 				//send_string("GET http://192.168.0.105/api/number/01 HTTP/1.0 Host: 192.168.0.105 Connection: keep-alive Accept: */*\n\n");
 				send_string(request);
@@ -140,10 +140,6 @@ for(;;){
 		break;
 		case receive_http_data:{
 			//here we receive data from server
-			//get position of +IPD,
-
-			//char * ptr = strstr(uart_buffer.buffer, "Content-Type: text/html");
-//check if get all data
 			if( (sizeof_http_request(uart_buffer.buffer)+16) <= uart_buffer.current_pos ){
 
 				char temp[555];
@@ -153,7 +149,7 @@ for(;;){
 				char *ticket = prepare_ticket( get_queue_number(content));
 				send_string_2("print ticket\n");
 				send_string_2(ticket);
-
+				printMessage(stringToByte(ticket));
 				uart_flag = disconnecting;
 				set_orange_led_on();
 			}
@@ -212,12 +208,12 @@ char* get_http_content(char *buffer){
  	return content_ptr;
 }
 char* get_queue_number(char *content){
-	char * content_ptr = strstr(content, "number:")+8;
-	char queue_number[8]=""; strncpy(queue_number,content_ptr,7);
+	char * content_ptr = strstr(content, "number:\"")+8;
+	char queue_number[8]=""; strncpy(queue_number,content_ptr,8);
 	queue_number[7]='\0';
-	return queue_number;
+	return (&queue_number);
 }
-char *prepare_ticket(char queue_number[8]){
+char *prepare_ticket(char * queue_number){
 	char *ticket_message;
 	strcpy(ticket_message,"\r\n Bilet STMLPTPQS\r\n Twoj\tNumer\r\n\r\n\t");
 	strcat(ticket_message,queue_number);
