@@ -7,7 +7,7 @@
             <link rel="stylesheet" type="text/css" href="{{ asset('css/base.css') }}" />
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
-        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="{{ asset('jquery-1.12.4.min.js') }}"></script>
     </head>
     <body>
         <div id="wrapper">
@@ -25,7 +25,7 @@
                         $("#maincontent").empty();
                         $.each(data, function (key, value) {
                             var html = '<div class="nmb"><h3>' + value.generatedNum + '</h3>'
-                                + '<p>Stanowisko:' + value.name + '</p></div>';
+                                + '<p>Position:' + value.name + '</p></div>';
                             $( html ).appendTo("#maincontent");
                         });
                     });
