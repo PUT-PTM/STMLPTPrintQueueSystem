@@ -188,6 +188,14 @@ for(;;){
 		Delayms(20);
 
 	}
+
+	if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_6) == 1) {
+		category[0] = '1';
+		category[1] = '\0';
+	} else if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_7) == 1) {
+		category[0] = "2";
+		category[1] = '\0';
+	}
 }
 
 }
