@@ -20,12 +20,18 @@ WebSys should be installed on Web Server, which provides PHP Interpreter and MyS
 STM layer requires: LPT Printer, 2 buttons and ESP8266 WiFi module to work properly. Connection schema is presented below:
 
 STM <-> Printer (LPT)
+
 GPIOA - Pin 0..7 (Data lines)
+
 GPIOB - Pin 6 (Button 1), Pin 7 (Button 2), Pin 8 (LPT ACK)
+
 GPIOD - Pin 9 (LPT Busy)
+
 GPIOE - Pin 10 (LPT Strobe)
 
+
 STM <-> ESP8266 (UART4)
+
 GPIOC - Pin 10 (Tx on STM, Rx on ESP), Pin 11 (Rx on STM, Tx on ESP)
 
 Other connections are internal on STM32 Discovery boards.
